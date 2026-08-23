@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura Cosmetics</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Предзагрузка фонов -->
+  <link rel="preload" as="image" href="Aura_Cosmetics_mobile.webp"
+    media="(max-width: 1024px) and (orientation: portrait), (max-width: 768px)" />
+  <link rel="preload" as="image" href="Aura_Cosmetics.webp"
+    media="(min-width: 769px) and (orientation: landscape), (min-width: 1025px)" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Контейнер фонового плеера -->
+  <div id="ytplayer-container"
+    style="position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -1000; overflow: hidden;">
+    <div id="ytplayer"></div>
+  </div>
+
+  <header class="header">
+    <a href="#hero" class="logo" id="mainLogo" aria-label="AURA Home">AURA</a>
+
+    <div class="sound-control-wrapper">
+      <button class="sound-icon-btn" id="volumeToggleBtn" aria-label="Adjust Volume">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path class="sound-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+
+      <button class="sound-text-btn" id="soundToggleBtn">
+        <span class="sound-text">SOUND OFF</span>
+      </button>
+
+      <div class="volume-dropdown" id="volumeDropdown">
+        <input type="range" id="volumeSlider" min="0" max="100" value="25" class="volume-slider" />
+      </div>
+    </div>
+
+    <button class="burger-btn" id="burgerBtn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <!-- Навигация -->
+  <nav class="side-nav">
+    <a href="#hero">HOME</a>
+    <a href="#products">PRODUCTS</a>
+    <a href="#aboutPanel">ABOUT</a>
+    <a href="#contactPanel">CONTACT</a>
+  </nav>
+
+  <main class="hero" id="hero">
+    <div class="slider">
+      <!-- Слайд 1 -->
+      <div class="slide active">
+        <video class="bg-video" autoplay muted playsinline disablePictureInPicture disableRemotePlayback preload="auto">
+          <source src="Yellow_Jar_Desktop.webm" media="(min-width: 950px)" type="video/webm" />
+          <source src="Yellow_Jar_Tablet.webm" media="(min-width: 601px)" type="video/webm" />
+          <source src="Yellow_Jar_Mobile.webm" type="video/webm" />
+        </video>
+        <div class="hero-content">
+          <h1 class="title">NATURAL<br />SKINCARE<br />REDEFINED</h1>
+          <p class="description">
+            DEEP HYDRATION FORMULA ENRICHED WITH BOTANICAL EXTRACTS.
+            LIGHTWEIGHT TEXTURE FOR A RADIANT, YOUTHFUL, AND PERFECTLY SMOOTH
+            COMPLEXION.
+          </p>
+          <a href="#product-yellow" class="btn product-link">SHOP NOW</a>
+        </div>
+      </div>
+
+      <!-- Слайд 2 -->
+      <div class="slide">
+        <video class="bg-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
+          <source src="Pink_Jar_Desktop.webm" media="(min-width: 950px)" type="video/webm" />
+          <source src="Pink_Jar_Tablet.webm" media="(min-width: 601px)" type="video/webm" />
+          <source src="Pink_Jar_Mobile.webm" type="video/webm" />
+        </video>
+        <div class="hero-content">
+          <h1 class="title">ADVANCED<br />NIGHT<br />REPAIR</h1>
+          <p class="description">
+            INTENSIVE NOURISHING COMPLEX WITH ROSA CANINA OILS. REGENERATES
+            YOUR SKIN CELLS OVERNIGHT FOR AN INTENSE GLOW.
+          </p>
+          <a href="#product-pink" class="btn product-link">EXPLORE MORE</a>
+        </div>
+      </div>
+
+      <button class="slider-arrow prev-arrow" aria-label="Previous Slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="slider-arrow next-arrow" aria-label="Next Slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <button class="close-menu-btn" id="closeMenuBtn" aria-label="Close Menu"></button>
+
+  <!-- Секция товаров -->
+  <section class="products-section" id="products">
+
+    <!-- Продукт 1 -->
+    <div class="product-row" id="product-yellow">
+      <div class="product-info">
+        <h3 class="product-title">ADVANCED NIGHT REPAIR</h3>
+        <p class="product-desc">
+          INTENSIVE NOURISHING NIGHT COMPLEX WITH BOTANICAL OILS
+        </p>
+      </div>
+
+      <div class="product-preview">
+        <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
+          <source src="Yellow_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
+          <source src="Yellow_Jar_Mobile.webm" type="video/webm" />
+        </video>
+      </div>
+    </div>
+
+    <!-- Продукт 2 -->
+    <div class="product-row" id="product-pink">
+      <div class="product-info">
+        <h3 class="product-title">RENEWING FACE CREAM</h3>
+        <p class="product-desc">
+          DEEP HYDRATION FORMULA FOR RADIANT AND SMOOTH SKIN
+        </p>
+      </div>
+
+      <div class="product-preview">
+        <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
+          <source src="Pink_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
+          <source src="Pink_Jar_Mobile.webm" type="video/webm" />
+        </video>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Оверлей ABOUT -->
+  <section id="aboutPanel" class="products-section side-panel-half">
+    <div class="panel-content">
+      <h2 class="panel-title">ABOUT AURA</h2>
+      <p class="panel-desc">About section content will appear here...</p>
+    </div>
+  </section>
+
+  <!-- Оверлей CONTACT -->
+  <section id="contactPanel" class="products-section side-panel-half">
+    <div class="panel-content">
+      <h2 class="panel-title">CONTACT US</h2>
+      <p class="panel-desc">Contact section content will appear here...</p>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
