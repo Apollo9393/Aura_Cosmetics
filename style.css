@@ -428,6 +428,15 @@ body.scrolled-past-hero .burger-btn {
   background-color: #000000 !important;
 }
 
+/* ДЕСКТОП И НОУТБУКИ: Спуск плашек ниже от главного экрана */
+@media (min-width: 1025px) and (orientation: landscape),
+(min-width: 1201px) {
+  .products-section {
+    padding: 180px 0 160px 0 !important;
+    overflow: hidden !important;
+  }
+}
+
 .product-row {
   position: relative;
   width: 100%;
@@ -482,11 +491,11 @@ body.scrolled-past-hero .burger-btn {
 
 .product-preview {
   position: absolute;
-  right: 60px;
-  top: 62%;
-  /* <-- Баночка опущена ниже (регулируй это значение) */
-  width: 680px;
-  height: 680px;
+  right: 35px;
+  top: 50%;
+  /* Положение и увеличенный размер баночки для ПК и ноутбуков */
+  width: 900px;
+  height: 900px;
   opacity: 0;
   visibility: hidden !important;
   /* УБИВАЕТ НЕВИДИМУЮ СТЕНУ */
@@ -582,18 +591,20 @@ body.scrolled-past-hero .burger-btn {
   -webkit-backdrop-filter: blur(25px) saturate(160%) !important;
   border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
   transform: translate3d(100%, 0, 0) !important;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s !important;
   overflow-y: auto !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
   pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .products-section.overlay-mode.open,
 .side-panel-half.open {
   transform: translate3d(0, 0, 0) !important;
   pointer-events: auto !important;
+  visibility: visible !important;
 }
 
 .panel-content {
