@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    AURA COSMETICS — MAIN STYLESHEET
    ========================================================================== */
 
@@ -426,6 +426,7 @@ body.scrolled-past-hero .burger-btn {
   flex-direction: column;
   gap: 80px;
   background-color: #000000 !important;
+  overflow: hidden !important;
 }
 
 /* ДЕСКТОП И НОУТБУКИ: Спуск плашек ниже от главного экрана */
@@ -519,11 +520,18 @@ body.scrolled-past-hero .burger-btn {
 }
 
 .product-row.auto-active .product-preview,
-.product-row.highlighted .product-preview,
-.product-row:hover .product-preview {
+.product-row.highlighted .product-preview {
   opacity: 1;
   visibility: visible !important;
   transform: translate3d(15px, -50%, 0) scale(1.0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product-row:hover .product-preview {
+    opacity: 1;
+    visibility: visible !important;
+    transform: translate3d(15px, -50%, 0) scale(1.0);
+  }
 }
 
 .product-row.auto-active::before,
@@ -749,6 +757,29 @@ body.scrolled-past-hero .burger-btn {
 
   .bg-video.fade-out-left {
     transform: translate(-5%, -50%) scale(1.05) !important;
+  }
+
+  .products-section {
+    padding: 200px 0 160px 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Сдвиг банки правее и оптимизация размера для ландшафтных планшетов */
+  .product-info {
+    max-width: 44% !important;
+  }
+
+  .product-preview {
+    right: -15px !important;
+    width: 740px !important;
+    height: 740px !important;
+    top: 50% !important;
+    transform: translate3d(-30px, -50%, 0) scale(0.95) !important;
+  }
+
+  .product-row.auto-active .product-preview,
+  .product-row.highlighted .product-preview {
+    transform: translate3d(25px, -50%, 0) scale(1.08) !important;
   }
 }
 
@@ -982,9 +1013,14 @@ body.scrolled-past-hero .burger-btn {
   }
 
   .product-row.auto-active .product-preview,
-  .product-row.highlighted .product-preview,
-  .product-row:hover .product-preview {
+  .product-row.highlighted .product-preview {
     transform: translate3d(25px, -50%, 0) scale(1.25) !important;
+  }
+
+  .products-section {
+    padding: 140px 0 120px 0 !important;
+    overflow: hidden !important;
+    min-height: auto !important;
   }
 }
 
@@ -1041,6 +1077,11 @@ body.scrolled-past-hero .burger-btn {
     transform: translateY(-50%) scale(1.2) !important;
     z-index: 300 !important;
   }
+
+  .products-section {
+    padding: 120px 0 120px 0 !important;
+    overflow: hidden !important;
+  }
 }
 
 /* ПЛАНШЕТЫ И СКЛАДНЫЕ ЭКРАНЫ В ПОРТРЕТЕ */
@@ -1068,6 +1109,7 @@ body.scrolled-past-hero .burger-btn {
     background: rgba(12, 12, 12, 0.88) !important;
     backdrop-filter: blur(14px) !important;
     -webkit-backdrop-filter: blur(14px) !important;
+    overflow: hidden !important;
   }
 
   .header {
@@ -1263,7 +1305,7 @@ body.scrolled-past-hero .burger-btn {
     width: 110vw !important;
     height: 48vh !important;
     max-height: 650px !important;
-    transform: translate(calc(-50% + 35px), -50%) scale(1.50) !important;
+    transform: translate(calc(-50% + 15px), -50%) scale(1.50) !important;
     object-fit: contain !important;
     z-index: 300 !important;
     pointer-events: none !important;
@@ -1444,19 +1486,19 @@ body.scrolled-past-hero .burger-btn {
   .product-row {
     margin-bottom: 480px !important;
     /* Уменьшаем расстояние до следующего товара */
-    min-height: 190px !important;
+    min-height: 150px !important;
   }
 
   .product-row::before {
     height: 100% !important;
-    min-height: 190px !important;
+    min-height: 150px !important;
     -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0) 80%) !important;
     mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0) 80%) !important;
   }
 
   .product-info {
     height: 100% !important;
-    min-height: 190px !important;
+    min-height: 150px !important;
     padding: 16px 20px !important;
     max-width: 80% !important;
     display: flex !important;
@@ -1491,6 +1533,7 @@ body.scrolled-past-hero .burger-btn {
   .product-row.highlighted .product-preview {
     transform: translateX(-50%) scale(1.6) !important;
   }
+
 }
 
 @media (max-width: 1024px) and (orientation: portrait),
@@ -1713,6 +1756,7 @@ body.scrolled-past-hero .burger-btn {
     padding: 40px 0 120px 0 !important;
     /* Добавили аккуратный зазор 40px сверху */
     gap: 0px !important;
+    overflow: hidden !important;
   }
 
   .product-row {
@@ -1871,6 +1915,7 @@ body.scrolled-past-hero .burger-btn {
   .products-section {
     padding: 30px 0 120px 0 !important;
     gap: 0 !important;
+    overflow: hidden !important;
   }
 
   .product-row {

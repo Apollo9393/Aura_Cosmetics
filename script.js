@@ -329,8 +329,18 @@ const initApp = () => {
         if (!r.classList.contains("auto-active")) {
           const previewVideo = r.querySelector(".preview-video");
           const doActivate = () => {
+            if (activeProductRow !== r) return;
             requestAnimationFrame(() => {
+              if (activeProductRow !== r) return;
               requestAnimationFrame(() => {
+                if (activeProductRow !== r) return;
+                // Гасим все остальные строки повторно
+                rows.forEach((other) => {
+                  if (other !== r) {
+                    other.classList.remove("auto-active", "highlighted");
+                    stopRowPreviewVideo(other);
+                  }
+                });
                 r.classList.add("auto-active");
                 playRowPreviewVideo(r, 0);
               });
@@ -346,7 +356,7 @@ const initApp = () => {
             const onReady = () => {
               previewVideo.removeEventListener("loadeddata", onReady);
               previewVideo.removeEventListener("canplay", onReady);
-              doActivate();
+              if (activeProductRow === r) doActivate();
             };
             previewVideo.addEventListener("loadeddata", onReady, { once: true });
             previewVideo.addEventListener("canplay", onReady, { once: true });
@@ -354,17 +364,15 @@ const initApp = () => {
             setTimeout(() => {
               previewVideo.removeEventListener("loadeddata", onReady);
               previewVideo.removeEventListener("canplay", onReady);
-              if (!r.classList.contains("auto-active")) doActivate();
+              if (activeProductRow === r && !r.classList.contains("auto-active")) doActivate();
             }, 800);
           } else {
             doActivate();
           }
         }
       } else {
-        if (r.classList.contains("auto-active") || r.classList.contains("highlighted")) {
-          r.classList.remove("auto-active", "highlighted");
-          stopRowPreviewVideo(r);
-        }
+        r.classList.remove("auto-active", "highlighted");
+        stopRowPreviewVideo(r);
       }
     });
 
@@ -483,38 +491,47 @@ const initApp = () => {
 
       const vHeight = isOverlay ? container.clientHeight : window.innerHeight;
       let targetRow = null;
-      let minDistanceToZone = Infinity;
 
-      // Опорная точка триггера (где удобнее всего фокусировать внимание)
-      const triggerPoint = scrollDirection === "down" ? (vHeight * 0.40) : (vHeight * 0.25);
-
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        const rRect = row.getBoundingClientRect();
-
-        // Включаем в эффективную высоту плашки расстояние до банки
-        const effectiveBottom = rRect.bottom + 260;
-
-        // Строка считается активной, если она занимает экран от самого верха (даже уйдя за 0px)
-        // и ее контент/банка еще не скрылись полностью из вида (effectiveBottom > 100px)
-        const isVisibleOnScreen = rRect.top <= triggerPoint && effectiveBottom >= 100;
-
-        if (isVisibleOnScreen) {
-          const rowCenter = rRect.top + (rRect.height * 0.5);
-          const dist = Math.abs(rowCenter - triggerPoint);
-
-          if (dist < minDistanceToZone) {
-            minDistanceToZone = dist;
+      if (scrollDirection === "down") {
+        const triggerPoint = vHeight * 0.42;
+        // При скролле вниз берем самую нижнюю строку, дошедшую до триггера
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const rRect = row.getBoundingClientRect();
+          const effectiveBottom = rRect.bottom + 260;
+          if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
             targetRow = row;
+          }
+        }
+      } else {
+        // При скролле снизу вверх:
+        // Активируем верхнюю строку, когда она возвращается в верхнюю зону
+        const triggerPoint = vHeight * 0.30;
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const rRect = row.getBoundingClientRect();
+          const effectiveBottom = rRect.bottom + 260;
+          if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
+            targetRow = row;
+          }
+        }
+
+        // КЛЮЧЕВОЙ МОМЕНТ: если верхняя строка еще не достигла триггера,
+        // удерживаем текущую активную плашку, чтобы она НЕ гасла на середине экрана!
+        if (!targetRow && activeProductRow) {
+          const curRect = activeProductRow.getBoundingClientRect();
+          const curEffectiveBottom = curRect.bottom + 260;
+          if (curRect.top < vHeight && curEffectiveBottom > 40) {
+            targetRow = activeProductRow;
           }
         }
       }
 
-      // Если ни одна строка точно не попала под триггер, но верхняя строка еще не ушла с экрана
+      // Если вообще ни одна строка не определилась, но мы внутри каталога
       if (!targetRow && rows.length > 0) {
         for (let i = 0; i < rows.length; i++) {
           const rRect = rows[i].getBoundingClientRect();
-          if (rRect.top <= 0 && (rRect.bottom + 260) > 120) {
+          if (rRect.top <= (vHeight * 0.5) && (rRect.bottom + 260) > 80) {
             targetRow = rows[i];
             break;
           }
@@ -524,7 +541,17 @@ const initApp = () => {
       if (targetRow && targetRow !== activeProductRow) {
         activateProductRow(container, targetRow, { shouldScroll: false, isUserClick: false });
       } else if (!targetRow && activeProductRow) {
-        deactivateAllProductRows(container);
+        let anyVisible = false;
+        for (let i = 0; i < rows.length; i++) {
+          const rRect = rows[i].getBoundingClientRect();
+          if (rRect.top < vHeight && (rRect.bottom + 260) > 0) {
+            anyVisible = true;
+            break;
+          }
+        }
+        if (!anyVisible) {
+          deactivateAllProductRows(container);
+        }
       }
     };
 
