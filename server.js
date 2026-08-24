@@ -16,6 +16,7 @@ const MIME_TYPES = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
   ".woff": "font/woff",
@@ -24,14 +25,12 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  // CORS & Security headers
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   let reqUrl = decodeURI(req.url.split("?")[0]);
   if (reqUrl === "/") reqUrl = "/index.html";
 
-  // Prevent directory traversal
   const safePath = path.normalize(path.join(ROOT_DIR, reqUrl));
   if (!safePath.startsWith(ROOT_DIR)) {
     res.writeHead(403, { "Content-Type": "text/plain" });
@@ -50,7 +49,6 @@ const server = http.createServer((req, res) => {
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
     const range = req.headers.range;
 
-    // HTTP 206 Partial Content support for videos
     if (range && (ext === ".webm" || ext === ".mp4")) {
       const parts = range.replace(/bytes=/, "").split("-");
       const start = parseInt(parts[0], 10);
@@ -70,7 +68,9 @@ const server = http.createServer((req, res) => {
         "Content-Length": stats.size,
         "Content-Type": contentType,
         "Accept-Ranges": "bytes",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
       });
       fs.createReadStream(safePath).pipe(res);
     }

@@ -27,6 +27,8 @@ body {
   background-color: #000000;
   overflow-x: hidden;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto !important;
 }
 
 .burger-btn {
@@ -485,6 +487,8 @@ body.scrolled-past-hero .burger-btn {
   -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
   transform: translate3d(100vw, 0, 0);
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   -ms-overflow-style: none !important;

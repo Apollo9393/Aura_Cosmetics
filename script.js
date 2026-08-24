@@ -172,7 +172,7 @@ class NeonBotanicalEngine {
   constructor(canvas, container) {
     this.canvas = canvas;
     this.container = container;
-    this.ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+    this.ctx = canvas.getContext("2d", { alpha: true });
 
     this.width = 0;
     this.height = 0;
@@ -220,11 +220,22 @@ class NeonBotanicalEngine {
     return isPortrait && isTabletWidth;
   }
 
-  initSize() {
+  initSize(force = false) {
     if (!this.container || !this.canvas) return;
     const rect = this.container.getBoundingClientRect();
-    this.width = this.container.scrollWidth || rect.width || window.innerWidth;
-    this.height = Math.max(this.container.scrollHeight || 0, rect.height || 0, window.innerHeight);
+    const newWidth = Math.round(this.container.scrollWidth || rect.width || window.innerWidth);
+    const newHeight = Math.round(Math.max(this.container.scrollHeight || 0, rect.height || 0, window.innerHeight));
+
+    if (!force && this.width > 0 && this.height > 0) {
+      const widthDiff = Math.abs(newWidth - this.width);
+      const heightDiff = Math.abs(newHeight - this.height);
+      if (widthDiff < 8 && heightDiff < 140) {
+        return;
+      }
+    }
+
+    this.width = newWidth;
+    this.height = newHeight;
     const isMob = this.isMobile();
     const isTabletPort = this.isPortraitTablet();
     this.dpr = isMob ? 1.0 : (isTabletPort ? 1.25 : Math.min(window.devicePixelRatio || 1, 1.5));
@@ -242,8 +253,26 @@ class NeonBotanicalEngine {
   }
 
   bindEvents() {
-    window.addEventListener("resize", () => this.initSize());
-    window.addEventListener("orientationchange", () => this.initSize());
+    let lastW = window.innerWidth;
+    let lastH = window.innerHeight;
+
+    window.addEventListener("resize", () => {
+      const curW = window.innerWidth;
+      const curH = window.innerHeight;
+      if (Math.abs(curW - lastW) > 20 || Math.abs(curH - lastH) > 150) {
+        lastW = curW;
+        lastH = curH;
+        this.initSize(true);
+      }
+    }, { passive: true });
+
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => {
+        lastW = window.innerWidth;
+        lastH = window.innerHeight;
+        this.initSize(true);
+      }, 100);
+    });
   }
 
   // 8 параметрических формул растений (Деревья, Кусты, Цветы)
@@ -316,9 +345,18 @@ class NeonBotanicalEngine {
   }
 
   spawnAt(x, y, themeIndex = null) {
+    const clampedX = Math.max(60, Math.min(this.width - 60, x));
+    if (this.isDrawingFlower && !this.isDissolving && this.flowerCenter && (this.flowerCenter.x !== 0 || this.flowerCenter.y !== 0)) {
+      const dist = Math.hypot(clampedX - this.flowerCenter.x, y - this.flowerCenter.y);
+      if (dist < 45 && themeIndex === null) {
+        this.recenter(clampedX, y);
+        return;
+      }
+    }
+
     this.isActive = true;
     this.baseCenter = { x, y };
-    this.flowerCenter = { x: Math.max(60, Math.min(this.width - 60, x)), y };
+    this.flowerCenter = { x: clampedX, y };
     this.flowerType = (themeIndex !== null && themeIndex !== undefined) ? themeIndex : this.pickRandomTheme(this.flowerType);
     this.isDrawingFlower = true;
     this.isDissolving = false;
@@ -418,7 +456,7 @@ class NeonBotanicalEngine {
             this.flowerProgress = 1.0;
             this.flowerCompletedTime = now;
           }
-        } 
+        }
         // Фаза дыхания (Breathe) после раскрытия — длится 3 секунды
         else if (!this.isDissolving) {
           const breatheTheta = now * 0.0025;
@@ -490,19 +528,18 @@ class NeonBotanicalEngine {
       if (this.trail.length > this.maxTrail) this.trail.pop();
 
       if (this.trail.length > 2 && this.isDrawingFlower) {
-        for (let i = 0; i < this.trail.length - 1; i++) {
-          const p1 = this.trail[i], p2 = this.trail[i + 1];
-          const ratio = 1 - (i / this.trail.length);
-          this.ctx.beginPath();
-          this.ctx.moveTo(p1.x, p1.y);
-          this.ctx.lineTo(p2.x, p2.y);
-          this.ctx.strokeStyle = `rgba(142, 245, 40, ${ratio * 0.85})`;
-          this.ctx.lineWidth = Math.max(1.5, ratio * (isTabletPort ? 7.0 : 5.5));
-          this.ctx.shadowColor = "#8ef528";
-          this.ctx.shadowBlur = wideGlowVal;
-          this.ctx.lineCap = "round";
-          this.ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.trail[0].x, this.trail[0].y);
+        for (let i = 1; i < this.trail.length; i++) {
+          this.ctx.lineTo(this.trail[i].x, this.trail[i].y);
         }
+        this.ctx.strokeStyle = "rgba(142, 245, 40, 0.75)";
+        this.ctx.lineWidth = isTabletPort ? 4.5 : 3.2;
+        this.ctx.shadowColor = "#8ef528";
+        this.ctx.shadowBlur = wideGlowVal;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+        this.ctx.stroke();
       }
 
       // Головная светящаяся частица
@@ -1235,9 +1272,17 @@ const initApp = () => {
     setTimeout(handleOrientationOrResize, 250);
   });
 
+  let lastAppResizeW = window.innerWidth;
+  let lastAppResizeH = window.innerHeight;
   window.addEventListener("resize", () => {
-    if (checkIsMobileOrPortraitTablet()) {
-      handleOrientationOrResize();
+    const curW = window.innerWidth;
+    const curH = window.innerHeight;
+    if (Math.abs(curW - lastAppResizeW) > 25 || Math.abs(curH - lastAppResizeH) > 160) {
+      lastAppResizeW = curW;
+      lastAppResizeH = curH;
+      if (checkIsMobileOrPortraitTablet()) {
+        handleOrientationOrResize();
+      }
     }
   }, { passive: true });
 
