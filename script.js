@@ -130,7 +130,7 @@ let touchStartX = 0;
 let touchStartY = 0;
 
 window.addEventListener("touchstart", (e) => {
-  if (e.target && e.target.closest && e.target.closest(".sound-control-wrapper, .side-nav, .slider-arrow, .btn, .burger-btn, .header, .products-section, .close-menu-btn")) return;
+  if (e.target && e.target.closest && e.target.closest(".side-nav, .slider-arrow, .btn, .burger-btn, .header, .products-section, .close-menu-btn")) return;
   if (document.body.classList.contains("overlay-open") || document.documentElement.classList.contains("overlay-open")) return;
   if (document.body.classList.contains("nav-menu-open") || document.documentElement.classList.contains("nav-menu-open")) return;
   if (document.querySelector(".products-section.open")) return;
@@ -141,7 +141,7 @@ window.addEventListener("touchstart", (e) => {
 }, { passive: true });
 
 window.addEventListener("touchend", (e) => {
-  if (e.target && e.target.closest && e.target.closest(".sound-control-wrapper, .side-nav, .slider-arrow, .btn, .burger-btn, .header, .products-section, .close-menu-btn")) return;
+  if (e.target && e.target.closest && e.target.closest(".side-nav, .slider-arrow, .btn, .burger-btn, .header, .products-section, .close-menu-btn")) return;
   if (document.body.classList.contains("overlay-open") || document.documentElement.classList.contains("overlay-open")) return;
   if (document.body.classList.contains("nav-menu-open") || document.documentElement.classList.contains("nav-menu-open")) return;
   if (document.querySelector(".products-section.open")) return;
@@ -330,6 +330,39 @@ class NeonBotanicalEngine {
     this.particle.y = this.flowerCenter.y;
     this.particle.targetX = this.flowerCenter.x;
     this.particle.targetY = this.flowerCenter.y;
+  }
+
+  recenter(newX, newY) {
+    const clampedX = Math.max(60, Math.min(this.width - 60, newX));
+    if (!this.flowerCenter || (this.flowerCenter.x === 0 && this.flowerCenter.y === 0)) {
+      this.flowerCenter = { x: clampedX, y: newY };
+      this.baseCenter = { x: clampedX, y: newY };
+      this.particle.x = clampedX;
+      this.particle.y = newY;
+      this.particle.targetX = clampedX;
+      this.particle.targetY = newY;
+      return;
+    }
+    const dx = clampedX - this.flowerCenter.x;
+    const dy = newY - this.flowerCenter.y;
+    this.flowerCenter = { x: clampedX, y: newY };
+    this.baseCenter = { x: clampedX, y: newY };
+    this.particle.x += dx;
+    this.particle.y += dy;
+    this.particle.targetX += dx;
+    this.particle.targetY += dy;
+    if (this.drawnPoints && this.drawnPoints.length > 0) {
+      for (let i = 0; i < this.drawnPoints.length; i++) {
+        this.drawnPoints[i].x += dx;
+        this.drawnPoints[i].y += dy;
+      }
+    }
+    if (this.trail && this.trail.length > 0) {
+      for (let i = 0; i < this.trail.length; i++) {
+        this.trail[i].x += dx;
+        this.trail[i].y += dy;
+      }
+    }
   }
 
   dissolve() {
@@ -591,11 +624,11 @@ const initApp = () => {
       video.load();
     }
 
-    if (video.currentTime > 0.08) {
-      try { video.currentTime = 0; } catch (e) { }
-    }
     const targetFreezeTime = 6.4;
     video.playbackRate = 2.5;
+
+    // Всегда сбрасываем на начало, чтобы анимация раскрытия банки начиналась заново
+    try { video.currentTime = 0; } catch (e) { }
 
     const startPlay = () => {
       if (!row.classList.contains("auto-active") && !row.matches(":hover")) return;
@@ -631,6 +664,7 @@ const initApp = () => {
         video._rafAnim = null;
       }
       video.pause();
+      try { video.currentTime = 0; } catch (e) { }
     }
   };
 
@@ -690,53 +724,20 @@ const initApp = () => {
     rows.forEach((r) => {
       if (r === row) {
         if (!r.classList.contains("auto-active")) {
-          const previewVideo = r.querySelector(".preview-video");
-          const doActivate = () => {
-            if (activeProductRow !== r) return;
-            requestAnimationFrame(() => {
-              if (activeProductRow !== r) return;
-              requestAnimationFrame(() => {
-                if (activeProductRow !== r) return;
-                // Гасим все остальные строки повторно
-                rows.forEach((other) => {
-                  if (other !== r) {
-                    other.classList.remove("auto-active", "highlighted");
-                    stopRowPreviewVideo(other);
-                  }
-                });
-                r.classList.add("auto-active");
-                playRowPreviewVideo(r, 0);
+          // Мгновенно гасим остальные плашки
+          rows.forEach((other) => {
+            if (other !== r) {
+              other.classList.remove("auto-active", "highlighted");
+              stopRowPreviewVideo(other);
+            }
+          });
+          r.classList.add("auto-active");
+          playRowPreviewVideo(r, 0);
 
-                if (botanicalEngine) {
-                  botanicalEngine.initSize();
-                  const center = getJarCenter(r, container);
-                  botanicalEngine.spawnAt(center.x, center.y);
-                }
-              });
-            });
-          };
-
-          if (previewVideo && previewVideo.readyState < 2) {
-            previewVideo.preload = "auto";
-            previewVideo.muted = true;
-            previewVideo.playsInline = true;
-            if (previewVideo.readyState === 0) previewVideo.load();
-
-            const onReady = () => {
-              previewVideo.removeEventListener("loadeddata", onReady);
-              previewVideo.removeEventListener("canplay", onReady);
-              if (activeProductRow === r) doActivate();
-            };
-            previewVideo.addEventListener("loadeddata", onReady, { once: true });
-            previewVideo.addEventListener("canplay", onReady, { once: true });
-
-            setTimeout(() => {
-              previewVideo.removeEventListener("loadeddata", onReady);
-              previewVideo.removeEventListener("canplay", onReady);
-              if (activeProductRow === r && !r.classList.contains("auto-active")) doActivate();
-            }, 800);
-          } else {
-            doActivate();
+          if (botanicalEngine) {
+            botanicalEngine.initSize();
+            const center = getJarCenter(r, container);
+            botanicalEngine.spawnAt(center.x, center.y);
           }
         }
       } else {
@@ -1055,6 +1056,19 @@ const initApp = () => {
         activateProductRow(activeOverlay, targetRow);
         targetRow.classList.add("highlighted");
         setTimeout(() => { targetRow.classList.remove("highlighted"); }, 2000);
+
+        const isLandscape = checkIsLandscape();
+        const targetScroll = calculateCenterScroll(activeOverlay, targetRow, isLandscape);
+        activeOverlay.scrollTop = targetScroll;
+
+        requestAnimationFrame(() => {
+          activeOverlay.scrollTop = targetScroll;
+          if (botanicalEngine) {
+            botanicalEngine.initSize();
+            const center = getJarCenter(targetRow, activeOverlay);
+            botanicalEngine.spawnAt(center.x, center.y);
+          }
+        });
       }
     }
 
@@ -1064,6 +1078,15 @@ const initApp = () => {
         activeOverlay.classList.add("open");
         document.body.classList.add("overlay-open");
         document.documentElement.classList.add("overlay-open");
+
+        if (targetId) {
+          const targetRow = activeOverlay.querySelector(targetId);
+          if (targetRow) {
+            const isLandscape = checkIsLandscape();
+            const targetScroll = calculateCenterScroll(activeOverlay, targetRow, isLandscape);
+            activeOverlay.scrollTop = targetScroll;
+          }
+        }
         updateActiveNav();
       }
     });
@@ -1153,7 +1176,7 @@ const initApp = () => {
 
   document.addEventListener("click", (e) => {
     if (!activeOverlay) return;
-    if (e.target.closest(".side-nav, .product-link, .close-menu-btn, .sound-control-wrapper, .burger-btn, .logo")) return;
+    if (e.target.closest(".side-nav, .product-link, .close-menu-btn, .burger-btn, .logo")) return;
     if (activeOverlay.classList.contains("side-panel-half") && !e.target.closest(".side-panel-half")) closeOverlayPanel();
   });
 
@@ -1185,132 +1208,38 @@ const initApp = () => {
     logoBtn.addEventListener("touchend", (e) => { e.preventDefault(); handleLogoClick(e); });
   }
 
-  let ytPlayer = null;
-  let isYtReady = false;
-  let isYtLoading = false;
-  let isAudioPlaying = false;
-  let pendingPlay = false;
-
-  const YT_CONFIG = { videoId: "TfX7k7h5izM", listId: "RDTfX7k7h5izM" };
-
-  const loadYouTubeApi = () => {
-    if (isYtReady || isYtLoading || (window.YT && window.YT.Player)) return;
-    isYtLoading = true;
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScript = document.getElementsByTagName("script")[0];
-    if (firstScript && firstScript.parentNode) firstScript.parentNode.insertBefore(tag, firstScript);
-    else document.head.appendChild(tag);
-  };
-
-  window.onYouTubeIframeAPIReady = function () {
-    try {
-      ytPlayer = new YT.Player("ytplayer", {
-        height: "1", width: "1", videoId: YT_CONFIG.videoId,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1, enablejsapi: 1, fs: 0, loop: 1, listType: "playlist", list: YT_CONFIG.listId, playsinline: 1, rel: 0 },
-        events: {
-          onReady: (event) => {
-            isYtReady = true;
-            isYtLoading = false;
-            const slider = document.getElementById("volumeSlider");
-            const vol = slider ? parseInt(slider.value, 10) : 25;
-            try {
-              event.target.setVolume(vol);
-              if (typeof event.target.setPlaybackQuality === "function") event.target.setPlaybackQuality("small");
-            } catch (e) { }
-            if (pendingPlay) {
-              pendingPlay = false;
-              startPlayback();
-            }
-          },
-          onStateChange: (event) => {
-            const volumeToggleBtn = document.getElementById("volumeToggleBtn"), soundText = document.querySelector(".sound-text");
-            if (event.data === YT.PlayerState.PLAYING) {
-              isAudioPlaying = true;
-              if (volumeToggleBtn) volumeToggleBtn.classList.add("playing");
-              if (soundText) soundText.textContent = "SOUND ON";
-            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-              isAudioPlaying = false;
-              if (volumeToggleBtn) volumeToggleBtn.classList.remove("playing");
-              if (soundText) soundText.textContent = "SOUND OFF";
-            }
-          }
-        }
-      });
-    } catch (err) { isYtReady = false; isYtLoading = false; }
-  };
-
-  const soundBtn = document.getElementById("soundToggleBtn"), volumeToggleBtn = document.getElementById("volumeToggleBtn"), volumeDropdown = document.getElementById("volumeDropdown"), volumeSlider = document.getElementById("volumeSlider");
-  const soundText = soundBtn ? soundBtn.querySelector(".sound-text") : null;
-
-  const updateSoundUI = (isPlaying) => {
-    isAudioPlaying = isPlaying;
-    if (isPlaying) {
-      if (volumeToggleBtn) volumeToggleBtn.classList.add("playing");
-      if (soundText) soundText.textContent = "SOUND ON";
-    } else {
-      if (volumeToggleBtn) volumeToggleBtn.classList.remove("playing");
-      if (soundText) soundText.textContent = "SOUND OFF";
-    }
-  };
-
-  const startPlayback = () => {
-    if (!isYtReady) {
-      pendingPlay = true;
-      loadYouTubeApi();
-      if (soundText) soundText.textContent = "LOADING...";
-      return;
-    }
-    const vol = volumeSlider ? parseInt(volumeSlider.value, 10) : 25;
-    if (ytPlayer && typeof ytPlayer.playVideo === "function") {
-      try {
-        ytPlayer.unMute();
-        ytPlayer.setVolume(vol);
-        ytPlayer.playVideo();
-        updateSoundUI(true);
-      } catch (err) { }
-    }
-  };
-
-  const stopPlayback = () => {
-    pendingPlay = false;
-    if (isYtReady && ytPlayer && typeof ytPlayer.pauseVideo === "function") {
-      try { ytPlayer.pauseVideo(); } catch (e) { }
-    }
-    updateSoundUI(false);
-  };
-
-  let lastToggleTime = 0;
-  const toggleSound = (e) => {
-    const now = Date.now();
-    if (now - lastToggleTime < 350) return;
-    lastToggleTime = now;
-    if (e) e.stopPropagation();
-    const isYtPlaying = isYtReady && ytPlayer && typeof ytPlayer.getPlayerState === "function" && ytPlayer.getPlayerState() === 1;
-    if (isYtPlaying || isAudioPlaying) stopPlayback();
-    else startPlayback();
-  };
-
-  if (soundBtn) {
-    soundBtn.addEventListener("click", toggleSound);
-    soundBtn.addEventListener("touchend", (e) => { e.preventDefault(); toggleSound(e); });
-  }
-
-  if (volumeToggleBtn && volumeDropdown) {
-    const toggleDropdown = (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } volumeDropdown.classList.toggle("show"); };
-    volumeToggleBtn.addEventListener("click", toggleDropdown);
-    volumeToggleBtn.addEventListener("touchend", toggleDropdown);
-    document.addEventListener("click", (e) => { if (!e.target.closest(".sound-control-wrapper")) volumeDropdown.classList.remove("show"); });
-  }
-
-  if (volumeSlider) {
-    volumeSlider.addEventListener("input", (e) => {
-      const volNum = parseInt(e.target.value, 10);
-      if (isYtReady && ytPlayer && typeof ytPlayer.setVolume === "function") {
-        try { ytPlayer.setVolume(volNum); } catch (err) { }
+  // Мгновенная адаптация и фиксация рисунка при смене ориентации (без перелетов и дерганий)
+  let resizeDebounceTimer = null;
+  const handleOrientationOrResize = () => {
+    document.body.classList.add("no-transitions");
+    if (botanicalEngine) {
+      botanicalEngine.initSize();
+      if (activeProductRow && productsSection) {
+        const center = getJarCenter(activeProductRow, productsSection);
+        botanicalEngine.recenter(center.x, center.y);
       }
-    });
-  }
+    }
+    if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+    resizeDebounceTimer = setTimeout(() => {
+      if (botanicalEngine && activeProductRow && productsSection) {
+        const center = getJarCenter(activeProductRow, productsSection);
+        botanicalEngine.recenter(center.x, center.y);
+      }
+      document.body.classList.remove("no-transitions");
+    }, 180);
+  };
+
+  window.addEventListener("orientationchange", () => {
+    handleOrientationOrResize();
+    setTimeout(handleOrientationOrResize, 80);
+    setTimeout(handleOrientationOrResize, 250);
+  });
+
+  window.addEventListener("resize", () => {
+    if (checkIsMobileOrPortraitTablet()) {
+      handleOrientationOrResize();
+    }
+  }, { passive: true });
 
   const burgerBtn = document.getElementById("burgerBtn") || document.querySelector(".burger-btn");
   const sideNav = document.querySelector(".side-nav");
