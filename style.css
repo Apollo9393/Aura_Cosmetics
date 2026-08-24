@@ -46,8 +46,6 @@ body.overlay-open,
 html.nav-menu-open,
 body.nav-menu-open {
   overflow: hidden !important;
-  height: 100vh !important;
-  touch-action: none !important;
   overscroll-behavior: none !important;
 }
 
@@ -322,8 +320,14 @@ body.no-transitions *::after {
   animation-duration: 0s !important;
 }
 
+/* Бургер доступен при обычном скролле сайта, но скрывается в выезжающем меню (оверлее) */
+.burger-btn {
+  pointer-events: auto !important;
+}
+
 body.overlay-open .burger-btn,
-body.scrolled-past-hero .burger-btn {
+html.overlay-open .burger-btn {
+  display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }
@@ -563,10 +567,10 @@ body.scrolled-past-hero .burger-btn {
 
 .close-menu-btn {
   position: fixed !important;
-  top: 34px !important;
-  right: 29px !important;
-  width: 44px !important;
-  height: 44px !important;
+  top: 42px !important;
+  right: 42px !important;
+  width: 32px !important;
+  height: 20px !important;
   background: transparent !important;
   border: none !important;
   cursor: pointer !important;
@@ -578,6 +582,7 @@ body.scrolled-past-hero .burger-btn {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  padding: 0 !important;
 }
 
 .close-menu-btn.show {
@@ -590,10 +595,10 @@ body.scrolled-past-hero .burger-btn {
 .close-menu-btn::after {
   content: "" !important;
   position: absolute !important;
-  width: 32px !important;
-  height: 4.5px !important;
+  width: 26px !important;
+  height: 3px !important;
   background: #8ef528 !important;
-  border-radius: 4px !important;
+  border-radius: 3px !important;
 }
 
 .close-menu-btn::before {
@@ -637,6 +642,19 @@ body.scrolled-past-hero .burger-btn {
 
   .logo {
     font-size: 28px !important;
+  }
+
+  .close-menu-btn {
+    top: 26px !important;
+    right: 30px !important;
+    width: 28px !important;
+    height: 20px !important;
+  }
+
+  .close-menu-btn::before,
+  .close-menu-btn::after {
+    width: 28px !important;
+    height: 2.5px !important;
   }
 
   .hero-content {
@@ -914,17 +932,41 @@ body.scrolled-past-hero .burger-btn {
     max-width: 100% !important;
   }
 
-  /* Сдвиг банки правее */
+  /* Сдвиг банки правее и супер-плавный вылет */
   .product-preview {
     right: -10px !important;
     width: 420px !important;
     height: 420px !important;
-    transform: translate3d(0, -50%, 0) scale(1.1) !important;
+    transform: translate3d(0, -50%, 0) scale(1.15) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
+    will-change: transform, opacity !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    transform-origin: center center !important;
   }
 
   .product-row.auto-active .product-preview,
   .product-row.highlighted .product-preview {
+    opacity: 1 !important;
+    visibility: visible !important;
     transform: translate3d(25px, -50%, 0) scale(1.25) !important;
+  }
+
+  /* Крестик в ландшафте строго равен активному бургеру (26x16px, полосы 26x2px) */
+  .close-menu-btn {
+    top: 12px !important;
+    right: 18px !important;
+    width: 26px !important;
+    height: 16px !important;
+  }
+
+  .close-menu-btn::before,
+  .close-menu-btn::after {
+    width: 26px !important;
+    height: 2px !important;
+    border-radius: 2px !important;
   }
 
   .products-section {
@@ -1037,6 +1079,20 @@ body.scrolled-past-hero .burger-btn {
   .logo {
     font-size: 32px !important;
     pointer-events: auto !important;
+  }
+
+  .close-menu-btn {
+    top: 30px !important;
+    right: 32px !important;
+    width: 32px !important;
+    height: 20px !important;
+  }
+
+  .close-menu-btn::before,
+  .close-menu-btn::after {
+    width: 32px !important;
+    height: 2.5px !important;
+    border-radius: 2px !important;
   }
 
   .burger-btn {
@@ -1183,7 +1239,7 @@ body.scrolled-past-hero .burger-btn {
     bottom: auto !important;
     left: auto !important;
     right: auto !important;
-    transform: none !important;
+    transform: translateX(0) translateZ(0) !important;
     width: calc(100% - 80px) !important;
     max-width: 380px !important;
     font-size: 16px !important;
@@ -1192,6 +1248,16 @@ body.scrolled-past-hero .burger-btn {
     z-index: 500 !important;
     pointer-events: auto !important;
     display: inline-block !important;
+    opacity: 1;
+    transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s !important;
+    will-change: transform, opacity;
+  }
+
+  body .hero .btn.fade-out-left,
+  body .hero .hero-content .btn.fade-out-left {
+    opacity: 0 !important;
+    transform: translateX(-60px) translateZ(0) !important;
+    transition: opacity 0.4s ease, transform 0.4s ease !important;
   }
 
   body .hero .bg-video,
@@ -1310,6 +1376,20 @@ body.scrolled-past-hero .burger-btn {
   .logo {
     font-size: 22px !important;
     letter-spacing: 1px !important;
+  }
+
+  .close-menu-btn {
+    top: 18px !important;
+    right: 18px !important;
+    width: 22px !important;
+    height: 13px !important;
+  }
+
+  .close-menu-btn::before,
+  .close-menu-btn::after {
+    width: 22px !important;
+    height: 2px !important;
+    border-radius: 2px !important;
   }
 
   .burger-btn {
@@ -1747,11 +1827,21 @@ body.scrolled-past-hero .burger-btn {
     left: 50% !important;
     right: auto !important;
     margin: 0 !important;
-    transform: translateX(-50%) !important;
+    transform: translateX(-50%) translateZ(0) !important;
     font-size: 15px !important;
     padding: 14px 40px !important;
     border-radius: 12px !important;
     z-index: 500 !important;
+    opacity: 1 !important;
+    transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s !important;
+    will-change: transform, opacity;
+  }
+
+  body .hero .btn.fade-out-left,
+  body .hero .hero-content .btn.fade-out-left {
+    opacity: 0 !important;
+    transform: translateX(calc(-50% - 60px)) translateZ(0) !important;
+    transition: opacity 0.4s ease, transform 0.4s ease !important;
   }
 
   /* Видео-банка Hero */

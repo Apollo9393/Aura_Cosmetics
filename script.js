@@ -664,8 +664,10 @@ const initApp = () => {
     const targetFreezeTime = 6.4;
     video.playbackRate = 2.5;
 
-    // Всегда сбрасываем на начало, чтобы анимация раскрытия банки начиналась заново
-    try { video.currentTime = 0; } catch (e) { }
+    // Сбрасываем на начало только если видео уже проиграно, чтобы исключить задержку видеодекодера
+    if (video.currentTime > 0.08) {
+      try { video.currentTime = 0; } catch (e) { }
+    }
 
     const startPlay = () => {
       if (!row.classList.contains("auto-active") && !row.matches(":hover")) return;
