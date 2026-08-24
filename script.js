@@ -166,10 +166,343 @@ window.addEventListener("touchend", (e) => {
 runSlideSequence(0);
 
 // ==========================================
+// БОТАНИЧЕСКИЙ ДВИЖОК (РАСТЕНИЯ)
+// ==========================================
+class NeonBotanicalEngine {
+  constructor(canvas, container) {
+    this.canvas = canvas;
+    this.container = container;
+    this.ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+
+    this.width = 0;
+    this.height = 0;
+    this.dpr = 1;
+    this.animFrameId = null;
+
+    // Параметры частицы и шлейфа
+    this.particle = { x: 0, y: 0, vx: 0, vy: 0, targetX: 0, targetY: 0 };
+    this.trail = [];
+    this.maxTrail = 55;
+
+    // Состояние анимации
+    this.isActive = false;
+    this.isDrawingFlower = false;
+    this.flowerProgress = 0;
+    this.flowerType = 0;
+    this.drawnPoints = [];
+    this.flowerCompletedTime = 0;
+    this.isDissolving = false;
+    this.flowerCenter = { x: 0, y: 0 };
+    this.baseCenter = { x: 0, y: 0 };
+
+    this.themes = [
+      { name: "Emerald Tree", glowColor: "rgba(142, 245, 40, 0.8)", coreColor: "rgba(235, 255, 210, 0.95)", shadowColor: "#8ef528" },
+      { name: "Botanical Leaf Branch", glowColor: "rgba(110, 255, 60, 0.8)", coreColor: "rgba(225, 255, 200, 0.95)", shadowColor: "#6eff3c" },
+      { name: "Sacred Lotus", glowColor: "rgba(162, 255, 66, 0.8)", coreColor: "rgba(240, 255, 220, 0.95)", shadowColor: "#a2ff42" },
+      { name: "Royal Rose", glowColor: "rgba(142, 245, 40, 0.85)", coreColor: "rgba(245, 255, 230, 0.95)", shadowColor: "#8ef528" },
+      { name: "Exotic Orchid", glowColor: "rgba(120, 255, 50, 0.8)", coreColor: "rgba(230, 255, 210, 0.95)", shadowColor: "#78ff32" },
+      { name: "Neon Sakura", glowColor: "rgba(175, 255, 80, 0.8)", coreColor: "rgba(245, 255, 225, 0.95)", shadowColor: "#afff50" },
+      { name: "Cyber Fern", glowColor: "rgba(130, 255, 70, 0.8)", coreColor: "rgba(230, 255, 215, 0.95)", shadowColor: "#82ff46" },
+      { name: "Weeping Willow", glowColor: "rgba(150, 250, 55, 0.8)", coreColor: "rgba(240, 255, 225, 0.95)", shadowColor: "#96fa37" }
+    ];
+
+    this.initSize();
+    this.bindEvents();
+  }
+
+  isMobile() {
+    return window.innerWidth <= 600 || (window.innerWidth <= 768 && window.innerHeight <= 600) || window.innerHeight <= 500;
+  }
+
+  isPortraitTablet() {
+    const isPortrait = window.matchMedia("(orientation: portrait)").matches || (window.innerHeight > window.innerWidth);
+    const isTabletWidth = (window.innerWidth >= 601 && window.innerWidth <= 1200);
+    return isPortrait && isTabletWidth;
+  }
+
+  initSize() {
+    if (!this.container || !this.canvas) return;
+    const rect = this.container.getBoundingClientRect();
+    this.width = this.container.scrollWidth || rect.width || window.innerWidth;
+    this.height = Math.max(this.container.scrollHeight || 0, rect.height || 0, window.innerHeight);
+    const isMob = this.isMobile();
+    const isTabletPort = this.isPortraitTablet();
+    this.dpr = isMob ? 1.0 : (isTabletPort ? 1.25 : Math.min(window.devicePixelRatio || 1, 1.5));
+    this.maxTrail = isMob ? 32 : 55;
+
+    this.canvas.width = Math.floor(this.width * this.dpr);
+    this.canvas.height = Math.floor(this.height * this.dpr);
+    this.canvas.style.width = `${this.width}px`;
+    this.canvas.style.height = `${this.height}px`;
+
+    if (this.ctx) {
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.scale(this.dpr, this.dpr);
+    }
+  }
+
+  bindEvents() {
+    window.addEventListener("resize", () => this.initSize());
+    window.addEventListener("orientationchange", () => this.initSize());
+  }
+
+  // 8 параметрических формул растений (Деревья, Кусты, Цветы)
+  getBotanicalPoint(t, cx, cy, radius, type) {
+    switch (type % 8) {
+      case 0: { // Emerald Tree (Дерево)
+        const theta = t * Math.PI * 10;
+        const branchWave = Math.sin(3 * theta) * Math.cos(2 * theta);
+        const r = radius * (0.35 + 0.65 * Math.abs(branchWave)) * (0.3 + 0.7 * t);
+        return { x: cx + r * Math.sin(theta) * 1.1 + Math.sin(7 * theta) * 16, y: cy - r * Math.cos(theta) * 0.95 - (1 - t) * 35 };
+      }
+      case 1: { // Botanical Leaf Branch / Bush (Куст / Ветка)
+        const theta = t * Math.PI * 8;
+        const stemY = (t - 0.5) * radius * 1.6;
+        const leafWave = Math.pow(Math.abs(Math.sin(2.5 * theta)), 1.5) * (1 - Math.abs(t - 0.5) * 0.5);
+        const side = Math.cos(theta) >= 0 ? 1 : -1;
+        return { x: cx + side * leafWave * radius * 0.85 + Math.sin(theta * 0.5) * 16, y: cy + stemY };
+      }
+      case 2: { // Sacred Lotus (Цветок Лотос)
+        const theta = t * Math.PI * 8;
+        const petal = Math.pow(Math.abs(Math.cos(4 * theta)), 0.8);
+        const r = radius * (0.28 + 0.72 * petal) * (0.35 + 0.65 * t);
+        return { x: cx + r * Math.cos(theta), y: cy + r * Math.sin(theta) * 0.85 };
+      }
+      case 3: { // Royal Rose (Цветок Роза)
+        const theta = t * Math.PI * 10;
+        const spiral = 0.22 + 0.78 * Math.sqrt(t);
+        const petal = 0.82 + 0.18 * Math.sin(6 * theta);
+        const r = radius * spiral * petal;
+        return { x: cx + r * Math.cos(theta), y: cy + r * Math.sin(theta) * 0.85 };
+      }
+      case 4: { // Exotic Orchid (Орхидея)
+        const theta = t * Math.PI * 6;
+        const wing = Math.sin(2.5 * theta) + 0.45 * Math.cos(5 * theta);
+        const r = radius * (0.3 + 0.7 * Math.abs(wing)) * (0.3 + 0.7 * t);
+        return { x: cx + r * Math.cos(theta) + Math.sin(7 * theta) * 12, y: cy + r * Math.sin(theta) * 0.75 + Math.cos(3 * theta) * 14 };
+      }
+      case 5: { // Neon Sakura (Сакура)
+        const theta = t * Math.PI * 10;
+        const petal = Math.cos(2.5 * theta);
+        const r = radius * (0.35 + 0.65 * Math.abs(petal)) * (0.3 + 0.7 * t);
+        return { x: cx + r * Math.cos(theta) + Math.sin(theta * 0.5) * 20, y: cy + r * Math.sin(theta) * 0.85 - Math.cos(theta * 0.5) * 15 };
+      }
+      case 6: { // Cyber Fern / Bush (Папоротник / Густой куст)
+        const theta = t * Math.PI * 9;
+        const curveX = Math.sin(theta * 0.4) * radius * 0.4;
+        const frond = Math.sin(4 * theta) * (1 - t * 0.5) * radius * 0.6;
+        const frondY = (t - 0.5) * radius * 1.5;
+        return { x: cx + curveX + frond, y: cy + frondY + Math.cos(2 * theta) * 10 };
+      }
+      case 7:
+      default: { // Weeping Willow (Плакучее дерево)
+        const theta = t * Math.PI * 10;
+        const arch = Math.sin(theta * 0.5);
+        const cascade = Math.cos(3 * theta) * radius * 0.5;
+        const r = radius * (0.3 + 0.7 * t);
+        return { x: cx + arch * r * 0.9 + Math.sin(5 * theta) * 15, y: cy - (1 - t) * 40 + Math.abs(cascade) * 1.1 };
+      }
+    }
+  }
+
+  pickRandomTheme(excludeType = null) {
+    let nextType;
+    let attempts = 0;
+    do {
+      nextType = Math.floor(Math.random() * this.themes.length);
+      attempts++;
+    } while (this.themes.length > 1 && nextType === excludeType && attempts < 10);
+    return nextType;
+  }
+
+  spawnAt(x, y, themeIndex = null) {
+    this.isActive = true;
+    this.baseCenter = { x, y };
+    this.flowerCenter = { x: Math.max(60, Math.min(this.width - 60, x)), y };
+    this.flowerType = (themeIndex !== null && themeIndex !== undefined) ? themeIndex : this.pickRandomTheme(this.flowerType);
+    this.isDrawingFlower = true;
+    this.isDissolving = false;
+    this.flowerProgress = 0;
+    this.drawnPoints = [];
+    this.flowerCompletedTime = 0;
+
+    this.particle.x = this.flowerCenter.x;
+    this.particle.y = this.flowerCenter.y;
+    this.particle.targetX = this.flowerCenter.x;
+    this.particle.targetY = this.flowerCenter.y;
+  }
+
+  dissolve() {
+    this.isActive = false;
+    if (this.isDrawingFlower && !this.isDissolving) {
+      this.isDissolving = true;
+    }
+  }
+
+  stopDrawing() {
+    this.isActive = false;
+    this.isDrawingFlower = false;
+    this.isDissolving = false;
+    this.drawnPoints = [];
+  }
+
+  start() {
+    if (this.animFrameId) return;
+
+    const animate = () => {
+      this.animFrameId = requestAnimationFrame(animate);
+      if (!this.ctx) return;
+
+      // Очистка с учетом DPR
+      this.ctx.save();
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.restore();
+
+      const now = Date.now();
+      const isMob = this.isMobile();
+      const isTabletPort = this.isPortraitTablet();
+      const currentTheme = this.themes[this.flowerType % this.themes.length];
+
+      const wideGlowVal = isTabletPort ? 32 : (isMob ? 8 : 26);
+      const coreGlowVal = isTabletPort ? 12 : (isMob ? 2 : 10);
+      const botanicalRadius = isTabletPort
+        ? Math.min(this.width * 0.58, 480)
+        : (isMob ? Math.min(this.width * 0.44, 230) : Math.min(this.width * 0.28, 300));
+      const outerLineWidth = isTabletPort ? 4.5 : 3.6;
+      const coreLineWidth = isTabletPort ? 1.8 : 1.4;
+      const particleRadius = isTabletPort ? 5.5 : 4.5;
+
+      if (this.isDrawingFlower) {
+        // Фаза роста
+        if (this.flowerProgress < 1.0) {
+          this.flowerProgress += 0.012;
+          const pt = this.getBotanicalPoint(this.flowerProgress, this.flowerCenter.x, this.flowerCenter.y, botanicalRadius, this.flowerType);
+          this.drawnPoints.push(pt);
+          this.particle.x += (pt.x - this.particle.x) * 0.45;
+          this.particle.y += (pt.y - this.particle.y) * 0.45;
+          if (this.flowerProgress >= 1.0) {
+            this.flowerProgress = 1.0;
+            this.flowerCompletedTime = now;
+          }
+        } 
+        // Фаза дыхания (Breathe) после раскрытия — длится 3 секунды
+        else if (!this.isDissolving) {
+          const breatheTheta = now * 0.0025;
+          const pt = this.getBotanicalPoint(0.96, this.flowerCenter.x, this.flowerCenter.y, botanicalRadius * (1 + 0.04 * Math.sin(breatheTheta)), this.flowerType);
+          this.particle.x += (pt.x - this.particle.x) * 0.1;
+          this.particle.y += (pt.y - this.particle.y) * 0.1;
+          if (now - this.flowerCompletedTime >= 3000) {
+            this.isDissolving = true;
+          }
+        }
+
+        // Фаза растворения
+        if (this.isDissolving) {
+          if (this.drawnPoints.length > 0) {
+            this.drawnPoints.splice(0, 4);
+          }
+          this.particle.targetX = this.baseCenter.x;
+          this.particle.targetY = this.baseCenter.y;
+          this.particle.vx = (this.particle.targetX - this.particle.x) * 0.12;
+          this.particle.vy = (this.particle.targetY - this.particle.y) * 0.12;
+          this.particle.x += this.particle.vx;
+          this.particle.y += this.particle.vy;
+
+          // Когда растворение завершено:
+          if (this.drawnPoints.length === 0) {
+            if (this.isActive) {
+              // Если плашка все еще активна — сразу запускаем новое случайное растение!
+              this.flowerType = this.pickRandomTheme(this.flowerType);
+              this.isDissolving = false;
+              this.flowerProgress = 0;
+              this.drawnPoints = [];
+              this.flowerCompletedTime = 0;
+              this.isDrawingFlower = true;
+            } else {
+              // Если плашка закрыта/свернута — останавливаем отрисовку
+              this.isDissolving = false;
+              this.isDrawingFlower = false;
+              this.flowerProgress = 0;
+            }
+          }
+        }
+
+        // Рендер двойного неонового свечения
+        if (this.drawnPoints.length > 2) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.drawnPoints[0].x, this.drawnPoints[0].y);
+          for (let i = 1; i < this.drawnPoints.length; i++) {
+            this.ctx.lineTo(this.drawnPoints[i].x, this.drawnPoints[i].y);
+          }
+          // Внешний контур (Широкий Glow)
+          this.ctx.strokeStyle = currentTheme.glowColor;
+          this.ctx.lineWidth = outerLineWidth;
+          this.ctx.shadowColor = currentTheme.shadowColor;
+          this.ctx.shadowBlur = wideGlowVal;
+          this.ctx.lineCap = "round";
+          this.ctx.lineJoin = "round";
+          this.ctx.stroke();
+
+          // Внутренний яркий сердечник (Core)
+          this.ctx.strokeStyle = currentTheme.coreColor;
+          this.ctx.lineWidth = coreLineWidth;
+          this.ctx.shadowBlur = coreGlowVal;
+          this.ctx.stroke();
+        }
+      }
+
+      // Траектория шлейфа (Particle Trail)
+      this.trail.unshift({ x: this.particle.x, y: this.particle.y, time: now });
+      if (this.trail.length > this.maxTrail) this.trail.pop();
+
+      if (this.trail.length > 2 && this.isDrawingFlower) {
+        for (let i = 0; i < this.trail.length - 1; i++) {
+          const p1 = this.trail[i], p2 = this.trail[i + 1];
+          const ratio = 1 - (i / this.trail.length);
+          this.ctx.beginPath();
+          this.ctx.moveTo(p1.x, p1.y);
+          this.ctx.lineTo(p2.x, p2.y);
+          this.ctx.strokeStyle = `rgba(142, 245, 40, ${ratio * 0.85})`;
+          this.ctx.lineWidth = Math.max(1.5, ratio * (isTabletPort ? 7.0 : 5.5));
+          this.ctx.shadowColor = "#8ef528";
+          this.ctx.shadowBlur = wideGlowVal;
+          this.ctx.lineCap = "round";
+          this.ctx.stroke();
+        }
+      }
+
+      // Головная светящаяся частица
+      if (this.isDrawingFlower) {
+        this.ctx.beginPath();
+        this.ctx.arc(this.particle.x, this.particle.y, particleRadius, 0, Math.PI * 2);
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.shadowColor = "#ffffff";
+        this.ctx.shadowBlur = wideGlowVal;
+        this.ctx.fill();
+      }
+    };
+
+    animate();
+  }
+
+  stop() {
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+  }
+}
+
+// ==========================================
 // ОСНОВНОЕ ПРИЛОЖЕНИЕ И ОВЕРЛЕИ
 // ==========================================
 const initApp = () => {
   const productsSection = document.querySelector(".products-section");
+  const botanicalCanvas = document.getElementById("botanicalCanvas");
+  const botanicalEngine = (botanicalCanvas && productsSection) ? new NeonBotanicalEngine(botanicalCanvas, productsSection) : null;
+  if (botanicalEngine) botanicalEngine.start();
+
   const closeMenuBtn = document.getElementById("closeMenuBtn");
   const productButtons = document.querySelectorAll(".product-link");
 
@@ -311,6 +644,36 @@ const initApp = () => {
     return Math.max(0, Math.round(rowCenter - viewportCenter));
   };
 
+  const getJarCenter = (row, container) => {
+    if (!row || !container) return { x: window.innerWidth * 0.7, y: 300 };
+    const preview = row.querySelector(".product-preview");
+    const containerRect = container.getBoundingClientRect();
+    const isMobile = checkIsMobileOrPortraitTablet();
+
+    if (preview) {
+      const pRect = preview.getBoundingClientRect();
+      if (pRect.width > 0 && pRect.height > 0) {
+        return {
+          x: pRect.left - containerRect.left + (pRect.width / 2),
+          y: pRect.top - containerRect.top + (container.scrollTop || 0) + (pRect.height / 2)
+        };
+      }
+    }
+
+    const rowY = row.offsetTop + (row.offsetHeight / 2);
+    if (isMobile) {
+      return {
+        x: container.clientWidth / 2,
+        y: rowY + 120
+      };
+    } else {
+      return {
+        x: Math.max(container.clientWidth * 0.75, container.clientWidth - 350),
+        y: rowY
+      };
+    }
+  };
+
   const toggleProductRow = (container, row, { shouldScroll = false, isUserClick = false } = {}) => {
     if (!container || !row) return;
     if (row.classList.contains("auto-active") && isUserClick) return;
@@ -343,6 +706,12 @@ const initApp = () => {
                 });
                 r.classList.add("auto-active");
                 playRowPreviewVideo(r, 0);
+
+                if (botanicalEngine) {
+                  botanicalEngine.initSize();
+                  const center = getJarCenter(r, container);
+                  botanicalEngine.spawnAt(center.x, center.y);
+                }
               });
             });
           };
@@ -389,6 +758,9 @@ const initApp = () => {
   const deactivateAllProductRows = (container) => {
     if (!container) return;
     activeProductRow = null;
+    if (botanicalEngine) {
+      botanicalEngine.dissolve();
+    }
     const rows = container.querySelectorAll(".product-row");
     rows.forEach((r) => {
       r.classList.remove("auto-active", "highlighted");
