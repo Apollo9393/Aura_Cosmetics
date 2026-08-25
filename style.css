@@ -163,8 +163,8 @@ body.nav-menu-open {
   height: 118%;
   object-fit: cover;
   object-position: center right;
-  transform: translate(calc(22% + 30px), -45px);
-  /* -45px поднимает видео выше */
+  transform: translate(calc(22% + 30px), -95px);
+  /* Поднято на 95px выше для идеального баланса на ПК */
   z-index: 300;
   pointer-events: none;
   opacity: 0;
@@ -175,14 +175,14 @@ body.nav-menu-open {
 /* Активное положение при проигрывании */
 .slide.active .bg-video {
   opacity: 1;
-  transform: translate(22%, -45px);
-  /* Поднято на 45px вверх */
+  transform: translate(22%, -95px);
+  /* Поднято выше */
 }
 
 /* Анимация ухода влево при переключении */
 .bg-video.fade-out-left {
   opacity: 0 !important;
-  transform: translate(calc(22% - 35px), -45px) !important;
+  transform: translate(calc(22% - 35px), -95px) !important;
 }
 
 .hero-content {
@@ -375,14 +375,14 @@ html.overlay-open .burger-btn {
   }
 }
 
-.botanical-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
+.firefly-canvas {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 999998 !important;
 }
 
 .product-row {
@@ -449,14 +449,20 @@ html.overlay-open .burger-btn {
   /* УБИВАЕТ НЕВИДИМУЮ СТЕНУ */
   pointer-events: none !important;
   /* ПРОПУСКАЕТ СКРОЛЛ */
-  transform: translate3d(-40px, -50%, 0) scale(0.95);
-  transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    visibility 0.4s;
-  will-change: transform, opacity;
+  transform: translate3d(15px, -50%, 0);
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  will-change: opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   z-index: 20;
+}
+
+.product-preview-float {
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .preview-video {
@@ -465,16 +471,66 @@ html.overlay-open .burger-btn {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  display: block;
+}
+
+/* Живая плавающая подложка за баночками каталога */
+.product-bg-ambient {
+  position: absolute;
+  top: 50%;
+  right: 90px;
+  width: 680px;
+  height: 440px;
+  transform: translateY(-50%) translateZ(0);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+  z-index: 2;
+  mask-image: radial-gradient(ellipse at 50% 50%, #000 80%, rgba(0, 0, 0, 0.6) 92%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 80%, rgba(0, 0, 0, 0.6) 92%, transparent 100%);
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+  will-change: opacity;
+  animation: ambientFloatDesktop 11s ease-in-out infinite alternate;
+}
+
+.product-bg-1 {
+  background-image: url("product1_bg.jpg") !important;
+}
+
+.product-bg-2 {
+  background-image: url("product2_bg.jpg") !important;
+}
+
+@keyframes ambientFloatDesktop {
+  0% {
+    transform: translateY(-50%) translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50%) translate(-12px, -6px) scale(1.02) rotate(0.5deg);
+  }
+  100% {
+    transform: translateY(-50%) translate(10px, 6px) scale(0.985) rotate(-0.5deg);
+  }
+}
+
+/* Строго по классам активности: НИКАКОГО :hover, чтобы исключить залипание и наложение фонов */
+.product-row.auto-active .product-bg-ambient,
+.product-row.highlighted .product-bg-ambient {
+  opacity: 0.65;
+  visibility: visible;
 }
 
 .product-row.auto-active .product-preview,
 .product-row.highlighted .product-preview {
   opacity: 1;
   visibility: visible;
-  transform: translate3d(15px, -50%, 0) scale(1.0);
+  transform: translate3d(15px, -50%, 0);
 }
 
 .product-row.auto-active::before,
@@ -958,11 +1014,11 @@ html.overlay-open .burger-btn {
     right: -10px !important;
     width: 420px !important;
     height: 420px !important;
-    transform: translate3d(0, -50%, 0) scale(1.15) !important;
+    transform: translate3d(25px, -50%, 0) scale(1.25) !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
-    will-change: transform, opacity !important;
+    transition: opacity 0.4s ease, visibility 0.4s ease !important;
+    will-change: opacity !important;
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     transform-origin: center center !important;
@@ -973,6 +1029,32 @@ html.overlay-open .burger-btn {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translate3d(25px, -50%, 0) scale(1.25) !important;
+  }
+
+
+  /* Живая подложка для первого продукта в ландшафте */
+  .product-bg-ambient {
+    right: 15px !important;
+    width: 390px !important;
+    height: 255px !important;
+    top: 50% !important;
+    border-radius: 12px !important;
+    animation: ambientFloatLandscape 8s ease-in-out infinite alternate !important;
+  }
+
+  @keyframes ambientFloatLandscape {
+    0% {
+      transform: translate3d(0, -50%, 0);
+    }
+    33% {
+      transform: translate3d(-10px, calc(-50% + 7px), 0);
+    }
+    66% {
+      transform: translate3d(8px, calc(-50% - 6px), 0);
+    }
+    100% {
+      transform: translate3d(-6px, calc(-50% - 5px), 0);
+    }
   }
 
   /* Крестик в ландшафте строго равен активному бургеру (26x16px, полосы 26x2px) */
@@ -1364,14 +1446,14 @@ html.overlay-open .burger-btn {
     position: absolute !important;
     left: 50% !important;
     top: 400px !important;
-    transform: translateX(-50%) scale(0.9) !important;
+    transform: translateX(-50%) scale(2.5) !important;
     width: 450px !important;
     height: 450px !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
     z-index: 2000 !important;
-    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease !important;
+    transition: opacity 0.4s ease, visibility 0.4s ease !important;
   }
 
   .preview-video {
@@ -1386,6 +1468,32 @@ html.overlay-open .burger-btn {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translateX(-50%) scale(2.5) !important;
+  }
+
+  /* Живая подложка в планшетном портрете — сохраняет размер и опущена ровно за баночку */
+  .product-bg-ambient {
+    left: 50% !important;
+    right: auto !important;
+    top: 610px !important;
+    width: 740px !important;
+    height: 490px !important;
+    border-radius: 20px !important;
+    animation: ambientFloatTabletPort 9s ease-in-out infinite alternate !important;
+  }
+
+  @keyframes ambientFloatTabletPort {
+    0% {
+      transform: translate3d(-50%, -50%, 0);
+    }
+    33% {
+      transform: translate3d(calc(-50% - 12px), calc(-50% + 9px), 0);
+    }
+    66% {
+      transform: translate3d(calc(-50% + 10px), calc(-50% - 8px), 0);
+    }
+    100% {
+      transform: translate3d(calc(-50% - 8px), calc(-50% - 7px), 0);
+    }
   }
 }
 
@@ -1498,15 +1606,47 @@ html.overlay-open .burger-btn {
   /* Поднимаем баночку выше под плашку */
   .product-preview {
     top: 250px !important;
-    /* Было 400px — подняли ближе к тексту */
     width: 320px !important;
     height: 320px !important;
-    transform: translateX(-50%) scale(0.9) !important;
+    transform: translateX(-50%) scale(1.6) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: 2000 !important;
+    transition: opacity 0.4s ease, visibility 0.4s ease !important;
   }
 
   .product-row.auto-active .product-preview,
   .product-row.highlighted .product-preview {
+    opacity: 1 !important;
+    visibility: visible !important;
     transform: translateX(-50%) scale(1.6) !important;
+  }
+
+  /* Живая подложка в мобильном портрете — исходный компактный размер, опущена за баночку */
+  .product-bg-ambient {
+    top: 440px !important;
+    left: 50% !important;
+    right: auto !important;
+    width: 325px !important;
+    height: 220px !important;
+    border-radius: 12px !important;
+    animation: ambientFloatMobile 8s ease-in-out infinite alternate !important;
+  }
+
+  @keyframes ambientFloatMobile {
+    0% {
+      transform: translate3d(-50%, -50%, 0);
+    }
+    33% {
+      transform: translate3d(calc(-50% - 10px), calc(-50% + 8px), 0);
+    }
+    66% {
+      transform: translate3d(calc(-50% + 9px), calc(-50% - 7px), 0);
+    }
+    100% {
+      transform: translate3d(calc(-50% - 6px), calc(-50% - 6px), 0);
+    }
   }
 
 }

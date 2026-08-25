@@ -166,80 +166,42 @@ window.addEventListener("touchend", (e) => {
 runSlideSequence(0);
 
 // ==========================================
-// БОТАНИЧЕСКИЙ ДВИЖОК (РАСТЕНИЯ)
+// ЖИВОЙ НЕОНОВЫЙ СВЕТЛЯЧОК (LIVING NEON FIREFLY)
 // ==========================================
-class NeonBotanicalEngine {
-  constructor(canvas, container) {
+class NeonFireflyEngine {
+  constructor(canvas) {
     this.canvas = canvas;
-    this.container = container;
-    this.ctx = canvas.getContext("2d", { alpha: true });
+    this.ctx = canvas ? canvas.getContext("2d", { alpha: true }) : null;
 
-    this.width = 0;
-    this.height = 0;
-    this.dpr = 1;
-    this.animFrameId = null;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    // Параметры частицы и шлейфа
-    this.particle = { x: 0, y: 0, vx: 0, vy: 0, targetX: 0, targetY: 0 };
+    // Позиция мыши / цели
+    this.mouseX = this.width / 2;
+    this.mouseY = this.height / 2;
+
+    // Физика светлячка (spring + chaotic organic wandering)
+    this.x = this.mouseX;
+    this.y = this.mouseY;
+    this.vx = 0;
+    this.vy = 0;
+
+    // Шлейф (хвост)
     this.trail = [];
-    this.maxTrail = 55;
+    this.maxTrail = 40;
 
-    // Состояние анимации
-    this.isActive = false;
-    this.isDrawingFlower = false;
-    this.flowerProgress = 0;
-    this.flowerType = 0;
-    this.drawnPoints = [];
-    this.flowerCompletedTime = 0;
-    this.isDissolving = false;
-    this.flowerCenter = { x: 0, y: 0 };
-    this.baseCenter = { x: 0, y: 0 };
-
-    this.themes = [
-      { name: "Emerald Tree", glowColor: "rgba(142, 245, 40, 0.8)", coreColor: "rgba(235, 255, 210, 0.95)", shadowColor: "#8ef528" },
-      { name: "Botanical Leaf Branch", glowColor: "rgba(110, 255, 60, 0.8)", coreColor: "rgba(225, 255, 200, 0.95)", shadowColor: "#6eff3c" },
-      { name: "Sacred Lotus", glowColor: "rgba(162, 255, 66, 0.8)", coreColor: "rgba(240, 255, 220, 0.95)", shadowColor: "#a2ff42" },
-      { name: "Royal Rose", glowColor: "rgba(142, 245, 40, 0.85)", coreColor: "rgba(245, 255, 230, 0.95)", shadowColor: "#8ef528" },
-      { name: "Exotic Orchid", glowColor: "rgba(120, 255, 50, 0.8)", coreColor: "rgba(230, 255, 210, 0.95)", shadowColor: "#78ff32" },
-      { name: "Neon Sakura", glowColor: "rgba(175, 255, 80, 0.8)", coreColor: "rgba(245, 255, 225, 0.95)", shadowColor: "#afff50" },
-      { name: "Cyber Fern", glowColor: "rgba(130, 255, 70, 0.8)", coreColor: "rgba(230, 255, 215, 0.95)", shadowColor: "#82ff46" },
-      { name: "Weeping Willow", glowColor: "rgba(150, 250, 55, 0.8)", coreColor: "rgba(240, 255, 225, 0.95)", shadowColor: "#96fa37" }
-    ];
+    this.animFrameId = null;
 
     this.initSize();
     this.bindEvents();
   }
 
-  isMobile() {
-    return window.innerWidth <= 600 || (window.innerWidth <= 768 && window.innerHeight <= 600) || window.innerHeight <= 500;
-  }
-
-  isPortraitTablet() {
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches || (window.innerHeight > window.innerWidth);
-    const isTabletWidth = (window.innerWidth >= 601 && window.innerWidth <= 1200);
-    return isPortrait && isTabletWidth;
-  }
-
-  initSize(force = false) {
-    if (!this.container || !this.canvas) return;
-    const rect = this.container.getBoundingClientRect();
-    const newWidth = Math.round(this.container.scrollWidth || rect.width || window.innerWidth);
-    const newHeight = Math.round(Math.max(this.container.scrollHeight || 0, rect.height || 0, window.innerHeight));
-
-    if (!force && this.width > 0 && this.height > 0) {
-      const widthDiff = Math.abs(newWidth - this.width);
-      const heightDiff = Math.abs(newHeight - this.height);
-      if (widthDiff < 8 && heightDiff < 140) {
-        return;
-      }
-    }
-
-    this.width = newWidth;
-    this.height = newHeight;
-    const isMob = this.isMobile();
-    const isTabletPort = this.isPortraitTablet();
-    this.dpr = isMob ? 1.0 : (isTabletPort ? 1.25 : Math.min(window.devicePixelRatio || 1, 1.5));
-    this.maxTrail = isMob ? 32 : 55;
+  initSize() {
+    if (!this.canvas) return;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     this.canvas.width = Math.floor(this.width * this.dpr);
     this.canvas.height = Math.floor(this.height * this.dpr);
@@ -253,313 +215,135 @@ class NeonBotanicalEngine {
   }
 
   bindEvents() {
-    let lastW = window.innerWidth;
-    let lastH = window.innerHeight;
+    window.addEventListener("resize", () => this.initSize(), { passive: true });
 
-    window.addEventListener("resize", () => {
-      const curW = window.innerWidth;
-      const curH = window.innerHeight;
-      if (Math.abs(curW - lastW) > 20 || Math.abs(curH - lastH) > 150) {
-        lastW = curW;
-        lastH = curH;
-        this.initSize(true);
+    window.addEventListener("mousemove", (e) => {
+      this.mouseX = e.clientX;
+      this.mouseY = e.clientY;
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches && e.touches[0]) {
+        this.mouseX = e.touches[0].clientX;
+        this.mouseY = e.touches[0].clientY;
       }
     }, { passive: true });
 
-    window.addEventListener("orientationchange", () => {
-      setTimeout(() => {
-        lastW = window.innerWidth;
-        lastH = window.innerHeight;
-        this.initSize(true);
-      }, 100);
-    });
-  }
-
-  // 8 параметрических формул растений (Деревья, Кусты, Цветы)
-  getBotanicalPoint(t, cx, cy, radius, type) {
-    switch (type % 8) {
-      case 0: { // Emerald Tree (Дерево)
-        const theta = t * Math.PI * 10;
-        const branchWave = Math.sin(3 * theta) * Math.cos(2 * theta);
-        const r = radius * (0.35 + 0.65 * Math.abs(branchWave)) * (0.3 + 0.7 * t);
-        return { x: cx + r * Math.sin(theta) * 1.1 + Math.sin(7 * theta) * 16, y: cy - r * Math.cos(theta) * 0.95 - (1 - t) * 35 };
+    window.addEventListener("touchstart", (e) => {
+      if (e.touches && e.touches[0]) {
+        this.mouseX = e.touches[0].clientX;
+        this.mouseY = e.touches[0].clientY;
       }
-      case 1: { // Botanical Leaf Branch / Bush (Куст / Ветка)
-        const theta = t * Math.PI * 8;
-        const stemY = (t - 0.5) * radius * 1.6;
-        const leafWave = Math.pow(Math.abs(Math.sin(2.5 * theta)), 1.5) * (1 - Math.abs(t - 0.5) * 0.5);
-        const side = Math.cos(theta) >= 0 ? 1 : -1;
-        return { x: cx + side * leafWave * radius * 0.85 + Math.sin(theta * 0.5) * 16, y: cy + stemY };
-      }
-      case 2: { // Sacred Lotus (Цветок Лотос)
-        const theta = t * Math.PI * 8;
-        const petal = Math.pow(Math.abs(Math.cos(4 * theta)), 0.8);
-        const r = radius * (0.28 + 0.72 * petal) * (0.35 + 0.65 * t);
-        return { x: cx + r * Math.cos(theta), y: cy + r * Math.sin(theta) * 0.85 };
-      }
-      case 3: { // Royal Rose (Цветок Роза)
-        const theta = t * Math.PI * 10;
-        const spiral = 0.22 + 0.78 * Math.sqrt(t);
-        const petal = 0.82 + 0.18 * Math.sin(6 * theta);
-        const r = radius * spiral * petal;
-        return { x: cx + r * Math.cos(theta), y: cy + r * Math.sin(theta) * 0.85 };
-      }
-      case 4: { // Exotic Orchid (Орхидея)
-        const theta = t * Math.PI * 6;
-        const wing = Math.sin(2.5 * theta) + 0.45 * Math.cos(5 * theta);
-        const r = radius * (0.3 + 0.7 * Math.abs(wing)) * (0.3 + 0.7 * t);
-        return { x: cx + r * Math.cos(theta) + Math.sin(7 * theta) * 12, y: cy + r * Math.sin(theta) * 0.75 + Math.cos(3 * theta) * 14 };
-      }
-      case 5: { // Neon Sakura (Сакура)
-        const theta = t * Math.PI * 10;
-        const petal = Math.cos(2.5 * theta);
-        const r = radius * (0.35 + 0.65 * Math.abs(petal)) * (0.3 + 0.7 * t);
-        return { x: cx + r * Math.cos(theta) + Math.sin(theta * 0.5) * 20, y: cy + r * Math.sin(theta) * 0.85 - Math.cos(theta * 0.5) * 15 };
-      }
-      case 6: { // Cyber Fern / Bush (Папоротник / Густой куст)
-        const theta = t * Math.PI * 9;
-        const curveX = Math.sin(theta * 0.4) * radius * 0.4;
-        const frond = Math.sin(4 * theta) * (1 - t * 0.5) * radius * 0.6;
-        const frondY = (t - 0.5) * radius * 1.5;
-        return { x: cx + curveX + frond, y: cy + frondY + Math.cos(2 * theta) * 10 };
-      }
-      case 7:
-      default: { // Weeping Willow (Плакучее дерево)
-        const theta = t * Math.PI * 10;
-        const arch = Math.sin(theta * 0.5);
-        const cascade = Math.cos(3 * theta) * radius * 0.5;
-        const r = radius * (0.3 + 0.7 * t);
-        return { x: cx + arch * r * 0.9 + Math.sin(5 * theta) * 15, y: cy - (1 - t) * 40 + Math.abs(cascade) * 1.1 };
-      }
-    }
-  }
-
-  pickRandomTheme(excludeType = null) {
-    let nextType;
-    let attempts = 0;
-    do {
-      nextType = Math.floor(Math.random() * this.themes.length);
-      attempts++;
-    } while (this.themes.length > 1 && nextType === excludeType && attempts < 10);
-    return nextType;
-  }
-
-  spawnAt(x, y, themeIndex = null) {
-    const clampedX = Math.max(60, Math.min(this.width - 60, x));
-    if (this.isDrawingFlower && !this.isDissolving && this.flowerCenter && (this.flowerCenter.x !== 0 || this.flowerCenter.y !== 0)) {
-      const dist = Math.hypot(clampedX - this.flowerCenter.x, y - this.flowerCenter.y);
-      if (dist < 45 && themeIndex === null) {
-        this.recenter(clampedX, y);
-        return;
-      }
-    }
-
-    this.isActive = true;
-    this.baseCenter = { x, y };
-    this.flowerCenter = { x: clampedX, y };
-    this.flowerType = (themeIndex !== null && themeIndex !== undefined) ? themeIndex : this.pickRandomTheme(this.flowerType);
-    this.isDrawingFlower = true;
-    this.isDissolving = false;
-    this.flowerProgress = 0;
-    this.drawnPoints = [];
-    this.flowerCompletedTime = 0;
-
-    this.particle.x = this.flowerCenter.x;
-    this.particle.y = this.flowerCenter.y;
-    this.particle.targetX = this.flowerCenter.x;
-    this.particle.targetY = this.flowerCenter.y;
-  }
-
-  recenter(newX, newY) {
-    const clampedX = Math.max(60, Math.min(this.width - 60, newX));
-    if (!this.flowerCenter || (this.flowerCenter.x === 0 && this.flowerCenter.y === 0)) {
-      this.flowerCenter = { x: clampedX, y: newY };
-      this.baseCenter = { x: clampedX, y: newY };
-      this.particle.x = clampedX;
-      this.particle.y = newY;
-      this.particle.targetX = clampedX;
-      this.particle.targetY = newY;
-      return;
-    }
-    const dx = clampedX - this.flowerCenter.x;
-    const dy = newY - this.flowerCenter.y;
-    this.flowerCenter = { x: clampedX, y: newY };
-    this.baseCenter = { x: clampedX, y: newY };
-    this.particle.x += dx;
-    this.particle.y += dy;
-    this.particle.targetX += dx;
-    this.particle.targetY += dy;
-    if (this.drawnPoints && this.drawnPoints.length > 0) {
-      for (let i = 0; i < this.drawnPoints.length; i++) {
-        this.drawnPoints[i].x += dx;
-        this.drawnPoints[i].y += dy;
-      }
-    }
-    if (this.trail && this.trail.length > 0) {
-      for (let i = 0; i < this.trail.length; i++) {
-        this.trail[i].x += dx;
-        this.trail[i].y += dy;
-      }
-    }
-  }
-
-  dissolve() {
-    this.isActive = false;
-    this.isDrawingFlower = false;
-    this.isDissolving = false;
-    this.drawnPoints = [];
-    this.trail = [];
-    if (this.ctx && this.canvas) {
-      try {
-        this.ctx.save();
-        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.restore();
-      } catch (e) { }
-    }
-  }
-
-  stopDrawing() {
-    this.isActive = false;
-    this.isDrawingFlower = false;
-    this.isDissolving = false;
-    this.drawnPoints = [];
+    }, { passive: true });
   }
 
   start() {
-    if (this.animFrameId) return;
+    if (this.animFrameId || !this.ctx) return;
+
+    let time = 0;
 
     const animate = () => {
       this.animFrameId = requestAnimationFrame(animate);
-      if (!this.ctx) return;
+      time += 0.032;
 
-      // Очистка с учетом DPR
+      // Хаотичное парение вокруг мышки (даже когда курсор неподвижен)
+      const t1 = time * 0.95;
+      const t2 = time * 1.8;
+      const t3 = time * 2.7;
+      const t4 = time * 0.45;
+
+      // 3D-подобные нелинейные петли и виражи
+      const flutterX = Math.sin(t1) * 36 + Math.cos(t2) * 20 + Math.sin(t4) * 26;
+      const flutterY = Math.cos(t1 * 1.1) * 36 + Math.sin(t3) * 18 + Math.cos(t4) * 24;
+
+      const targetX = this.mouseX + flutterX;
+      const targetY = this.mouseY + flutterY;
+
+      // Плавная физика преследования
+      const dx = targetX - this.x;
+      const dy = targetY - this.y;
+
+      this.vx += dx * 0.045;
+      this.vy += dy * 0.045;
+
+      // Мягкое демпфирование
+      this.vx *= 0.88;
+      this.vy *= 0.88;
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Запись шлейфа
+      this.trail.unshift({ x: this.x, y: this.y });
+      if (this.trail.length > this.maxTrail) {
+        this.trail.pop();
+      }
+
+      // Очистка Canvas
       this.ctx.save();
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.restore();
 
-      const now = Date.now();
-      const isMob = this.isMobile();
-      const isTabletPort = this.isPortraitTablet();
-      const currentTheme = this.themes[this.flowerType % this.themes.length];
+      // Отрисовка светящегося тёпло-яркого неонового хвоста
+      if (this.trail.length > 2) {
+        for (let i = 1; i < this.trail.length; i++) {
+          const ratio = 1 - (i / this.trail.length);
+          const p1 = this.trail[i - 1];
+          const p2 = this.trail[i];
 
-      const wideGlowVal = isTabletPort ? 32 : (isMob ? 8 : 26);
-      const coreGlowVal = isTabletPort ? 12 : (isMob ? 2 : 10);
-      const botanicalRadius = isTabletPort
-        ? Math.min(this.width * 0.58, 480)
-        : (isMob ? Math.min(this.width * 0.44, 230) : Math.min(this.width * 0.28, 300));
-      const outerLineWidth = isTabletPort ? 4.5 : 3.6;
-      const coreLineWidth = isTabletPort ? 1.8 : 1.4;
-      const particleRadius = isTabletPort ? 5.5 : 4.5;
-
-      if (this.isDrawingFlower) {
-        // Фаза роста
-        if (this.flowerProgress < 1.0) {
-          this.flowerProgress += 0.012;
-          const pt = this.getBotanicalPoint(this.flowerProgress, this.flowerCenter.x, this.flowerCenter.y, botanicalRadius, this.flowerType);
-          this.drawnPoints.push(pt);
-          this.particle.x += (pt.x - this.particle.x) * 0.45;
-          this.particle.y += (pt.y - this.particle.y) * 0.45;
-          if (this.flowerProgress >= 1.0) {
-            this.flowerProgress = 1.0;
-            this.flowerCompletedTime = now;
-          }
-        }
-        // Фаза дыхания (Breathe) после раскрытия — длится 3 секунды
-        else if (!this.isDissolving) {
-          const breatheTheta = now * 0.0025;
-          const pt = this.getBotanicalPoint(0.96, this.flowerCenter.x, this.flowerCenter.y, botanicalRadius * (1 + 0.04 * Math.sin(breatheTheta)), this.flowerType);
-          this.particle.x += (pt.x - this.particle.x) * 0.1;
-          this.particle.y += (pt.y - this.particle.y) * 0.1;
-          if (now - this.flowerCompletedTime >= 3000) {
-            this.isDissolving = true;
-          }
-        }
-
-        // Фаза растворения
-        if (this.isDissolving) {
-          if (this.drawnPoints.length > 0) {
-            this.drawnPoints.splice(0, 4);
-          }
-          this.particle.targetX = this.baseCenter.x;
-          this.particle.targetY = this.baseCenter.y;
-          this.particle.vx = (this.particle.targetX - this.particle.x) * 0.12;
-          this.particle.vy = (this.particle.targetY - this.particle.y) * 0.12;
-          this.particle.x += this.particle.vx;
-          this.particle.y += this.particle.vy;
-
-          // Когда растворение завершено:
-          if (this.drawnPoints.length === 0) {
-            if (this.isActive) {
-              // Если плашка все еще активна — сразу запускаем новое случайное растение!
-              this.flowerType = this.pickRandomTheme(this.flowerType);
-              this.isDissolving = false;
-              this.flowerProgress = 0;
-              this.drawnPoints = [];
-              this.flowerCompletedTime = 0;
-              this.isDrawingFlower = true;
-            } else {
-              // Если плашка закрыта/свернута — останавливаем отрисовку
-              this.isDissolving = false;
-              this.isDrawingFlower = false;
-              this.flowerProgress = 0;
-            }
-          }
-        }
-
-        // Рендер двойного неонового свечения
-        if (this.drawnPoints.length > 2) {
           this.ctx.beginPath();
-          this.ctx.moveTo(this.drawnPoints[0].x, this.drawnPoints[0].y);
-          for (let i = 1; i < this.drawnPoints.length; i++) {
-            this.ctx.lineTo(this.drawnPoints[i].x, this.drawnPoints[i].y);
-          }
-          // Внешний контур (Широкий Glow)
-          this.ctx.strokeStyle = currentTheme.glowColor;
-          this.ctx.lineWidth = outerLineWidth;
-          this.ctx.shadowColor = currentTheme.shadowColor;
-          this.ctx.shadowBlur = wideGlowVal;
-          this.ctx.lineCap = "round";
-          this.ctx.lineJoin = "round";
-          this.ctx.stroke();
+          this.ctx.moveTo(p1.x, p1.y);
+          this.ctx.lineTo(p2.x, p2.y);
 
-          // Внутренний яркий сердечник (Core)
-          this.ctx.strokeStyle = currentTheme.coreColor;
-          this.ctx.lineWidth = coreLineWidth;
-          this.ctx.shadowBlur = coreGlowVal;
+          // Внешнее неоновое сияние шлейфа (тёплый золотисто-зелёный неон)
+          this.ctx.strokeStyle = `rgba(255, 235, 90, ${ratio * 0.85})`;
+          this.ctx.lineWidth = Math.max(1, ratio * 4.5);
+          this.ctx.shadowColor = "#8ef528";
+          this.ctx.shadowBlur = Math.round(ratio * 16);
+          this.ctx.lineCap = "round";
           this.ctx.stroke();
         }
-      }
 
-      // Траектория шлейфа (Particle Trail)
-      this.trail.unshift({ x: this.particle.x, y: this.particle.y, time: now });
-      if (this.trail.length > this.maxTrail) this.trail.pop();
-
-      if (this.trail.length > 2 && this.isDrawingFlower) {
+        // Внутренняя яркая сердцевина шлейфа
         this.ctx.beginPath();
         this.ctx.moveTo(this.trail[0].x, this.trail[0].y);
-        for (let i = 1; i < this.trail.length; i++) {
+        for (let i = 1; i < Math.min(this.trail.length, 18); i++) {
           this.ctx.lineTo(this.trail[i].x, this.trail[i].y);
         }
-        this.ctx.strokeStyle = "rgba(142, 245, 40, 0.75)";
-        this.ctx.lineWidth = isTabletPort ? 4.5 : 3.2;
-        this.ctx.shadowColor = "#8ef528";
-        this.ctx.shadowBlur = wideGlowVal;
-        this.ctx.lineCap = "round";
-        this.ctx.lineJoin = "round";
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+        this.ctx.lineWidth = 1.8;
+        this.ctx.shadowColor = "#ffe259";
+        this.ctx.shadowBlur = 8;
         this.ctx.stroke();
       }
 
-      // Головная светящаяся частица
-      if (this.isDrawingFlower) {
-        this.ctx.beginPath();
-        this.ctx.arc(this.particle.x, this.particle.y, particleRadius, 0, Math.PI * 2);
-        this.ctx.fillStyle = "#ffffff";
-        this.ctx.shadowColor = "#ffffff";
-        this.ctx.shadowBlur = wideGlowVal;
-        this.ctx.fill();
-      }
+      // Головной яркий тёплый неоновый светлячок
+      const headRadius = 4.2 + Math.sin(time * 3) * 0.8;
+
+      // Внешнее тепло-неоновое свечение
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, headRadius + 4, 0, Math.PI * 2);
+      this.ctx.fillStyle = "rgba(142, 245, 40, 0.4)";
+      this.ctx.shadowColor = "#8ef528";
+      this.ctx.shadowBlur = 25;
+      this.ctx.fill();
+
+      // Тёплая золотисто-неоновая аура
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, headRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = "#ffe259";
+      this.ctx.shadowColor = "#ffe259";
+      this.ctx.shadowBlur = 15;
+      this.ctx.fill();
+
+      // Белое сияющее ядро
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, headRadius * 0.55, 0, Math.PI * 2);
+      this.ctx.fillStyle = "#ffffff";
+      this.ctx.shadowColor = "#ffffff";
+      this.ctx.shadowBlur = 6;
+      this.ctx.fill();
     };
 
     animate();
@@ -577,10 +361,11 @@ class NeonBotanicalEngine {
 // ОСНОВНОЕ ПРИЛОЖЕНИЕ И ОВЕРЛЕИ
 // ==========================================
 const initApp = () => {
+  const fireflyCanvas = document.getElementById("fireflyCanvas");
+  const fireflyEngine = fireflyCanvas ? new NeonFireflyEngine(fireflyCanvas) : null;
+  if (fireflyEngine) fireflyEngine.start();
+
   const productsSection = document.querySelector(".products-section");
-  const botanicalCanvas = document.getElementById("botanicalCanvas");
-  const botanicalEngine = (botanicalCanvas && productsSection) ? new NeonBotanicalEngine(botanicalCanvas, productsSection) : null;
-  if (botanicalEngine) botanicalEngine.start();
 
   const closeMenuBtn = document.getElementById("closeMenuBtn");
   const productButtons = document.querySelectorAll(".product-link");
@@ -678,13 +463,11 @@ const initApp = () => {
     const targetFreezeTime = 6.4;
     video.playbackRate = 2.5;
 
-    // Сбрасываем на начало только если видео уже проиграно, чтобы исключить задержку видеодекодера
-    if (video.currentTime > 0.08) {
-      try { video.currentTime = 0; } catch (e) { }
-    }
+    // Всегда начинаем воспроизведение с 0 кадра при новом открытии плашки
+    try { video.currentTime = 0; } catch (e) { }
 
     const startPlay = () => {
-      if (!row.classList.contains("auto-active") && !row.matches(":hover")) return;
+      if (!row.classList.contains("auto-active") && !row.classList.contains("highlighted")) return;
       const playPromise = video.play();
       if (playPromise !== undefined) playPromise.catch(() => { });
 
@@ -713,20 +496,11 @@ const initApp = () => {
       video._fadeStopTimer = null;
     }
 
-    if (immediate) {
-      if (video._rafAnim) {
-        cancelAnimationFrame(video._rafAnim);
-        video._rafAnim = null;
-      }
-      video.pause();
-      try { video.currentTime = 0; } catch (e) { }
-      return;
-    }
-
-    // При уходе мыши видео продолжает плавно двигаться во время CSS fade-out (500ms),
-    // не дергаясь и не сбрасываясь на 0 кадр в момент исчезновения
+    // При уходе мыши видео плавно доигрывает текущий кадр во время CSS fade-out (450ms),
+    // не дергаясь и не сбрасываясь на 0 кадр в момент исчезновения.
+    // Сброс и пауза происходят ТОЛЬКО когда плашка уже полностью прозрачна (opacity: 0).
     video._fadeStopTimer = setTimeout(() => {
-      if (!row.classList.contains("auto-active") && !row.matches(":hover")) {
+      if (!row.classList.contains("auto-active") && !row.classList.contains("highlighted")) {
         if (video._rafAnim) {
           cancelAnimationFrame(video._rafAnim);
           video._rafAnim = null;
@@ -734,7 +508,7 @@ const initApp = () => {
         video.pause();
         try { video.currentTime = 0; } catch (e) { }
       }
-    }, 550);
+    }, 450);
   };
 
   const calculateCenterScroll = (container, row, isLandscape) => {
@@ -802,12 +576,6 @@ const initApp = () => {
           });
           r.classList.add("auto-active");
           playRowPreviewVideo(r, 0);
-
-          if (botanicalEngine) {
-            botanicalEngine.initSize();
-            const center = getJarCenter(r, container);
-            botanicalEngine.spawnAt(center.x, center.y);
-          }
         }
       } else {
         r.classList.remove("auto-active", "highlighted");
@@ -828,9 +596,6 @@ const initApp = () => {
   const deactivateAllProductRows = (container) => {
     if (!container) return;
     activeProductRow = null;
-    if (botanicalEngine) {
-      botanicalEngine.dissolve();
-    }
     const rows = container.querySelectorAll(".product-row");
     rows.forEach((r) => {
       r.classList.remove("auto-active", "highlighted");
@@ -848,7 +613,7 @@ const initApp = () => {
         rows.forEach((r) => {
           if (r !== row) {
             r.classList.remove("auto-active", "highlighted");
-            stopRowPreviewVideo(r, true);
+            stopRowPreviewVideo(r);
           }
         });
         activateProductRow(container, row, { shouldScroll: false, isUserClick: false });
@@ -859,9 +624,6 @@ const initApp = () => {
         stopRowPreviewVideo(row);
         if (activeProductRow === row) {
           activeProductRow = null;
-          if (botanicalEngine) {
-            botanicalEngine.dissolve();
-          }
         }
         if (checkIsMobileOrPortraitTablet() && typeof updateCenterRowGlobal === "function") {
           setTimeout(updateCenterRowGlobal, 40);
@@ -1143,11 +905,6 @@ const initApp = () => {
 
         requestAnimationFrame(() => {
           activeOverlay.scrollTop = targetScroll;
-          if (botanicalEngine) {
-            botanicalEngine.initSize();
-            const center = getJarCenter(targetRow, activeOverlay);
-            botanicalEngine.spawnAt(center.x, center.y);
-          }
         });
       }
     }
@@ -1292,19 +1049,8 @@ const initApp = () => {
   let resizeDebounceTimer = null;
   const handleOrientationOrResize = () => {
     document.body.classList.add("no-transitions");
-    if (botanicalEngine) {
-      botanicalEngine.initSize();
-      if (activeProductRow && productsSection) {
-        const center = getJarCenter(activeProductRow, productsSection);
-        botanicalEngine.recenter(center.x, center.y);
-      }
-    }
     if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
     resizeDebounceTimer = setTimeout(() => {
-      if (botanicalEngine && activeProductRow && productsSection) {
-        const center = getJarCenter(activeProductRow, productsSection);
-        botanicalEngine.recenter(center.x, center.y);
-      }
       document.body.classList.remove("no-transitions");
     }, 180);
   };

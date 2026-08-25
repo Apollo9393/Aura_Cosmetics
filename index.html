@@ -19,7 +19,7 @@
   <link rel="preload" as="image" href="Aura_Cosmetics.webp"
     media="(min-width: 769px) and (orientation: landscape), (min-width: 1025px)" />
 
-  <link rel="stylesheet" href="style.css?v=3.8" />
+  <link rel="stylesheet" href="style.css?v=4.9" />
 </head>
 
 <body>
@@ -98,10 +98,10 @@
 
   <!-- Секция товаров -->
   <section class="products-section" id="products">
-    <canvas id="botanicalCanvas" class="botanical-canvas"></canvas>
 
     <!-- Продукт 1 -->
     <div class="product-row" id="product-yellow">
+      <div class="product-bg-ambient product-bg-1"></div>
       <div class="product-info">
         <h3 class="product-title">ADVANCED NIGHT REPAIR</h3>
         <p class="product-desc">
@@ -110,15 +110,18 @@
       </div>
 
       <div class="product-preview">
-        <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
-          <source src="Yellow_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
-          <source src="Yellow_Jar_Mobile.webm" type="video/webm" />
-        </video>
+        <div class="product-preview-float">
+          <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
+            <source src="Yellow_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
+            <source src="Yellow_Jar_Mobile.webm" type="video/webm" />
+          </video>
+        </div>
       </div>
     </div>
 
     <!-- Продукт 2 -->
     <div class="product-row" id="product-pink">
+      <div class="product-bg-ambient product-bg-2"></div>
       <div class="product-info">
         <h3 class="product-title">RENEWING FACE CREAM</h3>
         <p class="product-desc">
@@ -127,14 +130,19 @@
       </div>
 
       <div class="product-preview">
-        <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
-          <source src="Pink_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
-          <source src="Pink_Jar_Mobile.webm" type="video/webm" />
-        </video>
+        <div class="product-preview-float">
+          <video class="preview-video" muted playsinline disablePictureInPicture disableRemotePlayback preload="none">
+            <source src="Pink_Jar_Desktop.webm" media="(min-width: 1025px) and (min-height: 551px)" type="video/webm" />
+            <source src="Pink_Jar_Mobile.webm" type="video/webm" />
+          </video>
+        </div>
       </div>
     </div>
 
   </section>
+
+  <!-- Глобальный холст живого неонового светлячка (главная страница + все меню) -->
+  <canvas id="fireflyCanvas" class="firefly-canvas"></canvas>
 
   <!-- Оверлей ABOUT -->
   <section id="aboutPanel" class="products-section side-panel-half">
@@ -152,7 +160,7 @@
     </div>
   </section>
 
-  <script src="script.js?v=3.6"></script>
+  <script src="script.js?v=4.9"></script>
 </body>
 
 </html>
