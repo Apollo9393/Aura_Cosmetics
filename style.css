@@ -1605,7 +1605,7 @@ html.overlay-open .burger-btn {
 
   /* Поднимаем баночку выше под плашку */
   .product-preview {
-    top: 250px !important;
+    top: 190px !important;
     width: 320px !important;
     height: 320px !important;
     transform: translateX(-50%) scale(1.6) !important;
@@ -1623,14 +1623,14 @@ html.overlay-open .burger-btn {
     transform: translateX(-50%) scale(1.6) !important;
   }
 
-  /* Живая подложка в мобильном портрете — исходный компактный размер, опущена за баночку */
+  /* Живая подложка в мобильном портрете — поднята чуть выше и увеличена на волосок */
   .product-bg-ambient {
-    top: 440px !important;
+    top: 380px !important;
     left: 50% !important;
     right: auto !important;
-    width: 325px !important;
-    height: 220px !important;
-    border-radius: 12px !important;
+    width: 365px !important;
+    height: 250px !important;
+    border-radius: 14px !important;
     animation: ambientFloatMobile 8s ease-in-out infinite alternate !important;
   }
 
