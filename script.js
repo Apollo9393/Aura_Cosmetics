@@ -72,18 +72,12 @@ function runSlideSequence(slideIndex) {
     if (timeLeft <= 1.80 && !titleExited) {
       titleExited = true;
       if (title) title.classList.add("fade-out-left");
-    }
-    if (timeLeft <= 1.62 && !descExited) {
-      descExited = true;
       if (description) description.classList.add("fade-out-left");
+      if (btn) btn.classList.add("fade-out-left");
     }
-    if (timeLeft <= 1.44 && !videoExited) {
+    if (timeLeft <= 1.20 && !videoExited) {
       videoExited = true;
       if (video) video.classList.add("fade-out-left");
-    }
-    if (timeLeft <= 1.26 && !btnExited) {
-      btnExited = true;
-      if (btn) btn.classList.add("fade-out-left");
     }
 
     if (timeLeft <= 0.65 && !hasTriggeredExit) {
