@@ -25,6 +25,7 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
+  console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url} (${req.socket.remoteAddress})`);
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Access-Control-Allow-Origin", "*");
 

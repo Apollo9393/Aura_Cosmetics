@@ -405,8 +405,17 @@ class NeonBotanicalEngine {
 
   dissolve() {
     this.isActive = false;
-    if (this.isDrawingFlower && !this.isDissolving) {
-      this.isDissolving = true;
+    this.isDrawingFlower = false;
+    this.isDissolving = false;
+    this.drawnPoints = [];
+    this.trail = [];
+    if (this.ctx && this.canvas) {
+      try {
+        this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
+      } catch (e) { }
     }
   }
 
@@ -654,6 +663,11 @@ const initApp = () => {
     const video = row.querySelector(".preview-video");
     if (!video) return;
 
+    if (video._fadeStopTimer) {
+      clearTimeout(video._fadeStopTimer);
+      video._fadeStopTimer = null;
+    }
+
     video.muted = true;
     video.playsInline = true;
     if (video.readyState === 0) {
@@ -676,11 +690,6 @@ const initApp = () => {
 
       if (video._rafAnim) cancelAnimationFrame(video._rafAnim);
       const checkTime = () => {
-        if (!row.classList.contains("auto-active") && !row.matches(":hover")) {
-          video.pause();
-          video._rafAnim = null;
-          return;
-        }
         if (video.currentTime >= targetFreezeTime) {
           video.pause();
           video._rafAnim = null;
@@ -695,16 +704,37 @@ const initApp = () => {
     else startPlay();
   };
 
-  const stopRowPreviewVideo = (row) => {
+  const stopRowPreviewVideo = (row, immediate = false) => {
     const video = row.querySelector(".preview-video");
-    if (video) {
+    if (!video) return;
+
+    if (video._fadeStopTimer) {
+      clearTimeout(video._fadeStopTimer);
+      video._fadeStopTimer = null;
+    }
+
+    if (immediate) {
       if (video._rafAnim) {
         cancelAnimationFrame(video._rafAnim);
         video._rafAnim = null;
       }
       video.pause();
       try { video.currentTime = 0; } catch (e) { }
+      return;
     }
+
+    // При уходе мыши видео продолжает плавно двигаться во время CSS fade-out (500ms),
+    // не дергаясь и не сбрасываясь на 0 кадр в момент исчезновения
+    video._fadeStopTimer = setTimeout(() => {
+      if (!row.classList.contains("auto-active") && !row.matches(":hover")) {
+        if (video._rafAnim) {
+          cancelAnimationFrame(video._rafAnim);
+          video._rafAnim = null;
+        }
+        video.pause();
+        try { video.currentTime = 0; } catch (e) { }
+      }
+    }, 550);
   };
 
   const calculateCenterScroll = (container, row, isLandscape) => {
@@ -767,7 +797,7 @@ const initApp = () => {
           rows.forEach((other) => {
             if (other !== r) {
               other.classList.remove("auto-active", "highlighted");
-              stopRowPreviewVideo(other);
+              stopRowPreviewVideo(other, true);
             }
           });
           r.classList.add("auto-active");
@@ -781,7 +811,7 @@ const initApp = () => {
         }
       } else {
         r.classList.remove("auto-active", "highlighted");
-        stopRowPreviewVideo(r);
+        stopRowPreviewVideo(r, true);
       }
     });
 
@@ -818,7 +848,7 @@ const initApp = () => {
         rows.forEach((r) => {
           if (r !== row) {
             r.classList.remove("auto-active", "highlighted");
-            stopRowPreviewVideo(r);
+            stopRowPreviewVideo(r, true);
           }
         });
         activateProductRow(container, row, { shouldScroll: false, isUserClick: false });
@@ -827,7 +857,12 @@ const initApp = () => {
       row.addEventListener("mouseleave", () => {
         row.classList.remove("auto-active", "highlighted");
         stopRowPreviewVideo(row);
-        if (activeProductRow === row) activeProductRow = null;
+        if (activeProductRow === row) {
+          activeProductRow = null;
+          if (botanicalEngine) {
+            botanicalEngine.dissolve();
+          }
+        }
         if (checkIsMobileOrPortraitTablet() && typeof updateCenterRowGlobal === "function") {
           setTimeout(updateCenterRowGlobal, 40);
         }
@@ -867,6 +902,12 @@ const initApp = () => {
         if (Date.now() - lastTouchTapTime < 450) return;
         toggleProductRow(container, row, { shouldScroll: false, isUserClick: true });
       });
+    });
+
+    container.addEventListener("mouseleave", () => {
+      if (!checkIsMobileOrPortraitTablet()) {
+        deactivateAllProductRows(container);
+      }
     });
   };
   let updateCenterRowGlobal = null;
