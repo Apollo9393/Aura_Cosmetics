@@ -812,7 +812,6 @@ const initApp = () => {
   document.addEventListener("click", (e) => {
     if (!activeOverlay) return;
     if (e.target.closest(".side-nav, .product-link, .close-menu-btn, .burger-btn, .logo")) return;
-    if (activeOverlay.classList.contains("side-panel-half") && !e.target.closest(".side-panel-half")) closeOverlayPanel();
   });
 
   const logoBtn = document.querySelector(".logo");
