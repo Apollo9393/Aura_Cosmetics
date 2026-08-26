@@ -389,15 +389,6 @@ html.overlay-open .burger-btn {
   }
 }
 
-.firefly-canvas {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  pointer-events: none !important;
-  z-index: 999998 !important;
-}
 
 .product-row {
   position: relative;
@@ -1653,10 +1644,10 @@ html.overlay-open .burger-btn {
 
   body .hero .btn,
   body .hero .hero-content .btn {
-    bottom: 85px !important;
-    max-width: 250px !important;
-    padding: 13px 20px !important;
-    font-size: 15px !important;
+    bottom: 15px !important;
+    max-width: 220px !important;
+    padding: 12px 18px !important;
+    font-size: 13.5px !important;
   }
 
   .slider-arrow {
@@ -2599,7 +2590,6 @@ html.overlay-open .burger-btn {
 
   /* Стрелки — на волосок ниже */
   .slider-arrow {
-    bottom: 8px !important;
+    bottom: 3px !important;
   }
 }
-
