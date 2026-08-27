@@ -387,6 +387,10 @@ html.overlay-open .burger-btn {
     padding: 180px 0 160px 0 !important;
     overflow: hidden !important;
   }
+
+  .products-section.overlay-mode {
+    padding: 220px 0 180px 0 !important;
+  }
 }
 
 
@@ -568,7 +572,7 @@ html.overlay-open .burger-btn {
   max-width: 100vw !important;
   height: 100vh !important;
   height: 100dvh !important;
-  padding: 140px 0 160px 0 !important;
+  padding: 220px 0 180px 0 !important;
   z-index: 500000 !important;
   background: rgba(10, 10, 10, 0.98) !important;
   backdrop-filter: blur(20px) saturate(140%) !important;
@@ -870,6 +874,10 @@ html.overlay-open .burger-btn {
   .products-section {
     padding: 200px 0 160px 0 !important;
     overflow: hidden !important;
+  }
+
+  .products-section.overlay-mode {
+    padding: 230px 0 180px 0 !important;
   }
 
   /* Сдвиг банки правее и оптимизация размера для ландшафтных планшетов */
@@ -2711,6 +2719,10 @@ html.overlay-open .burger-btn {
     font-size: 22px !important;
     padding: 18px 40px !important;
     border-radius: 14px !important;
+  }
+
+  .products-section.overlay-mode {
+    padding: 240px 0 180px 0 !important;
   }
 
   .panel-content {
