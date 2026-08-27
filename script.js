@@ -365,19 +365,12 @@ const initApp = () => {
     rows.forEach((r) => {
       if (r === row) {
         if (!r.classList.contains("auto-active")) {
-          // Мгновенно гасим остальные плашки
-          rows.forEach((other) => {
-            if (other !== r) {
-              other.classList.remove("auto-active", "highlighted");
-              stopRowPreviewVideo(other, true);
-            }
-          });
           r.classList.add("auto-active");
           playRowPreviewVideo(r, 0);
         }
       } else {
         r.classList.remove("auto-active", "highlighted");
-        stopRowPreviewVideo(r, true);
+        stopRowPreviewVideo(r);
       }
     });
 
@@ -407,13 +400,6 @@ const initApp = () => {
     rows.forEach((row) => {
       // Единый обработчик наведения для мыши
       row.addEventListener("mouseenter", () => {
-        // Принудительно гасим ВСЕ остальные плашки перед открытием этой
-        rows.forEach((r) => {
-          if (r !== row) {
-            r.classList.remove("auto-active", "highlighted");
-            stopRowPreviewVideo(r);
-          }
-        });
         activateProductRow(container, row, { shouldScroll: false, isUserClick: false });
       });
 
@@ -860,13 +846,31 @@ const initApp = () => {
 
   let lastAppResizeW = window.innerWidth;
   let lastAppResizeH = window.innerHeight;
+  let wasMobileMode = checkIsMobileOrPortraitTablet();
+
   window.addEventListener("resize", () => {
     const curW = window.innerWidth;
     const curH = window.innerHeight;
+    const isMobileNow = checkIsMobileOrPortraitTablet();
+
+    // При возврате с мобильного режима на ПК сбрасываем залипшую мобильную плашку
+    if (wasMobileMode && !isMobileNow) {
+      if (productsSection) {
+        try {
+          if (!productsSection.matches(":hover")) {
+            deactivateAllProductRows(productsSection);
+          }
+        } catch (e) {
+          deactivateAllProductRows(productsSection);
+        }
+      }
+    }
+    wasMobileMode = isMobileNow;
+
     if (Math.abs(curW - lastAppResizeW) > 25 || Math.abs(curH - lastAppResizeH) > 160) {
       lastAppResizeW = curW;
       lastAppResizeH = curH;
-      if (checkIsMobileOrPortraitTablet()) {
+      if (isMobileNow) {
         handleOrientationOrResize();
       }
     }

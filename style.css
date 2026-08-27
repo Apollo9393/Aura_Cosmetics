@@ -638,36 +638,38 @@ html.overlay-open .burger-btn {
 }
 
 .panel-content {
-  padding: 80px 40px !important;
-  max-width: 660px !important;
+  padding: 90px 40px !important;
+  max-width: 760px !important;
   width: 100% !important;
   margin: auto !important;
   color: #ffffff !important;
-  text-align: left !important;
+  text-align: center !important;
   z-index: 10 !important;
   position: relative !important;
   box-sizing: border-box !important;
 }
 
 .panel-title {
-  font-size: 38px !important;
+  font-size: 46px !important;
   font-weight: 700 !important;
   letter-spacing: 2px !important;
-  margin-bottom: 22px !important;
+  margin-bottom: 24px !important;
   color: #8ef528 !important;
   text-shadow: 0 0 15px rgba(142, 245, 40, 0.5) !important;
+  text-align: center !important;
 }
 
 .panel-desc {
-  font-size: 16px !important;
-  line-height: 1.7 !important;
+  font-size: 17.5px !important;
+  line-height: 1.72 !important;
   color: rgba(255, 255, 255, 0.88) !important;
   font-weight: 400 !important;
   margin-bottom: 16px !important;
+  text-align: center !important;
 }
 
 .panel-desc:last-of-type {
-  margin-bottom: 24px !important;
+  margin-bottom: 26px !important;
 }
 
 .highlight-white {
@@ -676,46 +678,50 @@ html.overlay-open .burger-btn {
 
 .panel-stats {
   display: flex !important;
-  gap: 30px !important;
+  justify-content: center !important;
+  gap: 40px !important;
   border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-  padding-top: 20px !important;
+  padding-top: 24px !important;
 }
 
 .panel-stat-item {
   display: flex !important;
   flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
 }
 
 .panel-stat-num {
   color: #8ef528 !important;
-  font-size: 26px !important;
+  font-size: 30px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
 }
 
 .panel-stat-label {
   color: rgba(255, 255, 255, 0.6) !important;
-  font-size: 12px !important;
-  letter-spacing: 1px !important;
+  font-size: 13px !important;
+  letter-spacing: 1.2px !important;
   margin-top: 5px !important;
 }
 
 .panel-contact-box {
   border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-  padding-top: 18px !important;
-  margin-top: 20px !important;
+  padding-top: 20px !important;
+  margin-top: 22px !important;
+  text-align: center !important;
 }
 
 .panel-contact-label {
   color: rgba(255, 255, 255, 0.6) !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   letter-spacing: 1.5px !important;
-  margin-bottom: 4px !important;
+  margin-bottom: 6px !important;
 }
 
 .panel-contact-link {
   color: #8ef528 !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   font-weight: 600 !important;
   text-decoration: none !important;
   letter-spacing: 0.5px !important;
@@ -876,7 +882,7 @@ html.overlay-open .burger-btn {
     width: 740px !important;
     height: 740px !important;
     top: 50% !important;
-    transform: translate3d(-30px, -50%, 0) scale(0.95) !important;
+    transform: translate3d(25px, -50%, 0) scale(1.08) !important;
   }
 
   .product-row.auto-active .product-preview,
@@ -890,42 +896,52 @@ html.overlay-open .burger-btn {
 
   .panel-content {
     text-align: center !important;
-    max-width: 520px !important;
-    padding: 60px 24px !important;
+    max-width: 640px !important;
+    padding: 70px 32px !important;
   }
 
   .panel-title {
-    font-size: 28px !important;
-    letter-spacing: 1.5px !important;
-    margin-bottom: 16px !important;
+    font-size: 36px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 20px !important;
   }
 
   .panel-desc {
-    font-size: 13.5px !important;
-    line-height: 1.6 !important;
-    margin-bottom: 12px !important;
+    font-size: 15.5px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 14px !important;
   }
 
   .panel-desc:last-of-type {
-    margin-bottom: 18px !important;
+    margin-bottom: 20px !important;
   }
 
   .panel-stats {
     justify-content: center !important;
-    gap: 28px !important;
-    padding-top: 16px !important;
+    gap: 32px !important;
+    padding-top: 20px !important;
   }
 
   .panel-stat-num {
-    font-size: 22px !important;
+    font-size: 24px !important;
   }
 
   .panel-stat-label {
-    font-size: 11px !important;
+    font-size: 11.5px !important;
   }
 
   .panel-contact-box {
     text-align: center !important;
+    padding-top: 18px !important;
+    margin-top: 18px !important;
+  }
+
+  .panel-contact-label {
+    font-size: 12px !important;
+  }
+
+  .panel-contact-link {
+    font-size: 17px !important;
   }
 }
 
@@ -1388,7 +1404,7 @@ html.overlay-open .burger-btn {
     top: 50% !important;
     width: 520px !important;
     height: 520px !important;
-    transform: translate3d(0, -50%, 0) scale(1.18) !important;
+    transform: translate3d(20px, -50%, 0) scale(1.22) !important;
   }
 
   .product-row.auto-active .product-preview,
@@ -1803,42 +1819,52 @@ html.overlay-open .burger-btn {
 
   .panel-content {
     text-align: center !important;
-    max-width: 480px !important;
-    padding: 60px 24px !important;
+    max-width: 620px !important;
+    padding: 70px 32px !important;
   }
 
   .panel-title {
-    font-size: 26px !important;
-    letter-spacing: 1.5px !important;
-    margin-bottom: 16px !important;
+    font-size: 36px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 20px !important;
   }
 
   .panel-desc {
-    font-size: 13.5px !important;
-    line-height: 1.55 !important;
-    margin-bottom: 12px !important;
+    font-size: 15.5px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 14px !important;
   }
 
   .panel-desc:last-of-type {
-    margin-bottom: 18px !important;
+    margin-bottom: 20px !important;
   }
 
   .panel-stats {
     justify-content: center !important;
-    gap: 26px !important;
-    padding-top: 16px !important;
+    gap: 32px !important;
+    padding-top: 20px !important;
   }
 
   .panel-stat-num {
-    font-size: 21px !important;
+    font-size: 24px !important;
   }
 
   .panel-stat-label {
-    font-size: 10.5px !important;
+    font-size: 11.5px !important;
   }
 
   .panel-contact-box {
     text-align: center !important;
+    padding-top: 18px !important;
+    margin-top: 18px !important;
+  }
+
+  .panel-contact-label {
+    font-size: 12px !important;
+  }
+
+  .panel-contact-link {
+    font-size: 17px !important;
   }
 }
 
@@ -2056,6 +2082,10 @@ html.overlay-open .burger-btn {
   .side-panel-half.open {
     transform: translate3d(0, 0, 0) !important;
   }
+}
+
+/* МОБИЛЬНЫЕ ТЕЛЕФОНЫ (КОМПАКТНЫЕ ПАНЕЛИ) */
+@media (max-width: 600px) {
 
   .panel-content {
     text-align: center !important;
@@ -2682,6 +2712,64 @@ html.overlay-open .burger-btn {
     padding: 18px 40px !important;
     border-radius: 14px !important;
   }
+
+  .panel-content {
+    text-align: center !important;
+    max-width: 780px !important;
+    padding: 85px 40px !important;
+  }
+
+  .panel-title {
+    font-size: 50px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 26px !important;
+    text-align: center !important;
+  }
+
+  .panel-desc {
+    font-size: 18.5px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 18px !important;
+    text-align: center !important;
+  }
+
+  .panel-desc:last-of-type {
+    margin-bottom: 26px !important;
+  }
+
+  .panel-stats {
+    justify-content: center !important;
+    gap: 44px !important;
+    padding-top: 24px !important;
+  }
+
+  .panel-stat-item {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .panel-stat-num {
+    font-size: 32px !important;
+  }
+
+  .panel-stat-label {
+    font-size: 13.5px !important;
+    letter-spacing: 1.2px !important;
+  }
+
+  .panel-contact-box {
+    text-align: center !important;
+    padding-top: 22px !important;
+    margin-top: 22px !important;
+  }
+
+  .panel-contact-label {
+    font-size: 13px !important;
+  }
+
+  .panel-contact-link {
+    font-size: 20px !important;
+  }
 }
 
 /* ==========================================================================
@@ -2837,6 +2925,64 @@ html.overlay-open .burger-btn {
     transform: translate3d(-50%, -50%, 0);
     animation: ambientFloatTabletPort 9s ease-in-out infinite alternate !important;
   }
+
+  .panel-content {
+    text-align: center !important;
+    max-width: 760px !important;
+    padding: 85px 40px !important;
+  }
+
+  .panel-title {
+    font-size: 48px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 24px !important;
+    text-align: center !important;
+  }
+
+  .panel-desc {
+    font-size: 18px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 16px !important;
+    text-align: center !important;
+  }
+
+  .panel-desc:last-of-type {
+    margin-bottom: 24px !important;
+  }
+
+  .panel-stats {
+    justify-content: center !important;
+    gap: 40px !important;
+    padding-top: 24px !important;
+  }
+
+  .panel-stat-item {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .panel-stat-num {
+    font-size: 30px !important;
+  }
+
+  .panel-stat-label {
+    font-size: 13px !important;
+    letter-spacing: 1.2px !important;
+  }
+
+  .panel-contact-box {
+    text-align: center !important;
+    padding-top: 20px !important;
+    margin-top: 20px !important;
+  }
+
+  .panel-contact-label {
+    font-size: 12.5px !important;
+  }
+
+  .panel-contact-link {
+    font-size: 19px !important;
+  }
 }
 
 /* ==========================================================================
@@ -2905,7 +3051,7 @@ html.overlay-open .burger-btn {
     top: 50% !important;
     width: 600px !important;
     height: 600px !important;
-    transform: translate3d(0, -50%, 0) scale(0.85) !important;
+    transform: translate3d(20px, -50%, 0) scale(0.92) !important;
   }
 
   .product-row.auto-active .product-preview,
