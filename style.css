@@ -2824,11 +2824,11 @@ html.overlay-open .burger-btn {
     pointer-events: auto !important;
   }
 
-  /* 4. Кнопка — опущена ниже */
+  /* 4. Кнопка — поднята выше */
   body .hero .btn,
   body .hero .hero-content .btn {
     position: absolute !important;
-    bottom: 50px !important;
+    bottom: 78px !important;
     left: 50% !important;
     transform: translateX(-50%) translateZ(0) !important;
     margin: 0 !important;
@@ -2864,7 +2864,7 @@ html.overlay-open .burger-btn {
   }
 
   .slider-arrow {
-    bottom: 85px !important;
+    bottom: 112px !important;
   }
 }
 
