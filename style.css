@@ -609,9 +609,9 @@ html.overlay-open .burger-btn {
   height: 100vh !important;
   height: 100dvh !important;
   z-index: 500000 !important;
-  background: rgba(10, 10, 10, 0.98) !important;
-  backdrop-filter: blur(20px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  background: rgba(10, 10, 10, 0.88) !important;
+  backdrop-filter: blur(25px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(140%) !important;
   border-left: none !important;
   transform: translate3d(100vw, 0, 0) !important;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s !important;
