@@ -2347,6 +2347,7 @@ html.overlay-open .burger-btn {
     width: 100% !important;
     height: 50vh !important;
     object-fit: contain !important;
+    object-position: center center !important;
     z-index: 300 !important;
     pointer-events: none !important;
   }
