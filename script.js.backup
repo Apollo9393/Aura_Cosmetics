@@ -294,15 +294,9 @@ const initApp = () => {
       video._fadeStopTimer = null;
     }
 
-    if (immediate) {
-      if (video._rafAnim) {
-        cancelAnimationFrame(video._rafAnim);
-        video._rafAnim = null;
-      }
-      video.pause();
-      return;
-    }
-
+    // При уходе мыши видео плавно доигрывает текущий кадр во время CSS fade-out (450ms),
+    // не дергаясь и не сбрасываясь на 0 кадр в момент исчезновения.
+    // Сброс и пауза происходят ТОЛЬКО когда плашка уже полностью прозрачна (opacity: 0).
     video._fadeStopTimer = setTimeout(() => {
       if (!row.classList.contains("auto-active") && !row.classList.contains("highlighted")) {
         if (video._rafAnim) {
@@ -310,8 +304,9 @@ const initApp = () => {
           video._rafAnim = null;
         }
         video.pause();
+        try { video.currentTime = 0; } catch (e) { }
       }
-    }, 600);
+    }, 450);
   };
 
   const calculateCenterScroll = (container, row, isLandscape) => {

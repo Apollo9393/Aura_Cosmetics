@@ -19,7 +19,7 @@
   <link rel="preload" as="image" href="Aura_Cosmetics.webp"
     media="(min-width: 769px) and (orientation: landscape), (min-width: 1025px)" />
 
-  <link rel="stylesheet" href="style.css?v=9.3" />
+  <link rel="stylesheet" href="style.css?v=7.9" />
 </head>
 
 <body>
@@ -197,7 +197,7 @@
     </div>
   </section>
 
-  <script src="script.js?v=9.3"></script>
+  <script src="script.js?v=7.2"></script>
 </body>
 
 </html>
