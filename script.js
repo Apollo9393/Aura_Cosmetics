@@ -185,6 +185,12 @@ const initApp = () => {
       (window.innerWidth <= 768 && window.innerWidth > window.innerHeight);
   };
   const checkIsMobileOrPortraitTablet = () => {
+    // На экранах ПК и ноутбуков (ширина > 1024px и высота > 600px) — это полноценный десктоп,
+    // даже если в DevTools остался включённым touch-эмулятор от мобильной вкладки!
+    if (window.innerWidth > 1024 && window.innerHeight > 600) {
+      return false;
+    }
+
     return ('ontouchstart' in window) ||
       (navigator.maxTouchPoints > 0) ||
       (window.matchMedia("(pointer: coarse)").matches) ||
@@ -413,9 +419,6 @@ const initApp = () => {
         stopRowPreviewVideo(row);
         if (activeProductRow === row) {
           activeProductRow = null;
-        }
-        if (checkIsMobileOrPortraitTablet() && typeof updateCenterRowGlobal === "function") {
-          setTimeout(updateCenterRowGlobal, 40);
         }
       });
 
