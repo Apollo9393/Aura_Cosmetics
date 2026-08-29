@@ -562,8 +562,28 @@ html.overlay-open .burger-btn {
   color: #ffffff;
 }
 
+/* Глобальная плавающая анимация для всех ландшафтных ориентаций */
+@keyframes ambientFloatLandscape {
+  0% {
+    transform: translate3d(0, -50%, 0);
+  }
+
+  33% {
+    transform: translate3d(-10px, calc(-50% + 7px), 0);
+  }
+
+  66% {
+    transform: translate3d(8px, calc(-50% - 6px), 0);
+  }
+
+  100% {
+    transform: translate3d(-6px, calc(-50% - 5px), 0);
+  }
+}
+
 /* Во всех ландшафтных ориентациях: изображение за банкой и банка выше плашек */
 @media (orientation: landscape) {
+
   .product-row.auto-active,
   .product-row.highlighted {
     z-index: 100 !important;
@@ -962,8 +982,9 @@ html.overlay-open .burger-btn {
     top: calc(50% + 20px) !important;
     right: 65px !important;
     left: auto !important;
-    transform: translateY(-50%) translateZ(0) !important;
+    transform: translateY(-50%) translateZ(0);
     border-radius: 20px !important;
+    animation: ambientFloatLandscape 8s ease-in-out infinite alternate !important;
   }
 
   .slider-arrow {
@@ -1042,8 +1063,9 @@ html.overlay-open .burger-btn {
     top: calc(50% + 20px) !important;
     right: 55px !important;
     left: auto !important;
-    transform: translateY(-50%) translateZ(0) !important;
+    transform: translateY(-50%) translateZ(0);
     border-radius: 18px !important;
+    animation: ambientFloatLandscape 8s ease-in-out infinite alternate !important;
   }
 }
 
