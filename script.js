@@ -184,10 +184,20 @@ const initApp = () => {
       (window.innerHeight <= 600 && window.innerWidth > window.innerHeight) ||
       (window.innerWidth <= 768 && window.innerWidth > window.innerHeight);
   };
+  const checkIsTabletLandscape = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    return (w >= 700 && w <= 1400 && h >= 450 && h <= 1050 && w > h);
+  };
+
   const checkIsMobileOrPortraitTablet = () => {
-    // На экранах ПК и ноутбуков (ширина > 1024px и высота > 600px) — это полноценный десктоп,
-    // даже если в DevTools остался включённым touch-эмулятор от мобильной вкладки!
-    if (window.innerWidth > 1024 && window.innerHeight > 600) {
+    // Ландшафтные планшеты всегда активны для скролл-каталога
+    if (checkIsTabletLandscape()) {
+      return true;
+    }
+
+    // На экранах ПК и ноутбуков (ширина > 1024px и высота > 600px) без тача — это десктоп
+    if (window.innerWidth > 1024 && window.innerHeight > 600 && !('ontouchstart' in window) && (!navigator.maxTouchPoints || navigator.maxTouchPoints <= 1)) {
       return false;
     }
 
@@ -497,50 +507,97 @@ const initApp = () => {
       }
 
       const vHeight = isOverlay ? container.clientHeight : window.innerHeight;
+      const isTabLandscape = checkIsTabletLandscape();
       let targetRow = null;
 
-      if (scrollDirection === "down") {
-        const triggerPoint = vHeight * 0.42;
-        // При скролле вниз берем самую нижнюю строку, дошедшую до триггера
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          const rRect = row.getBoundingClientRect();
-          const effectiveBottom = rRect.bottom + 260;
-          if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
-            targetRow = row;
+      if (isTabLandscape) {
+        // ДЛЯ ПЛАНШЕТОВ В ЛАНДШАФТНОЙ ОРИЕНТАЦИИ:
+        // Сбалансированная центральная зона активации (54% от верха при скролле вниз, 38% при скролле вверх)
+        const triggerDown = vHeight * 0.54;
+        const triggerUp = vHeight * 0.38;
+
+        if (scrollDirection === "down") {
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rRect = row.getBoundingClientRect();
+            if (rRect.top <= triggerDown && rRect.bottom >= 40) {
+              targetRow = row;
+            }
           }
-        }
-      } else {
-        // При скролле снизу вверх:
-        // Активируем верхнюю строку, когда она возвращается в верхнюю зону
-        const triggerPoint = vHeight * 0.30;
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          const rRect = row.getBoundingClientRect();
-          const effectiveBottom = rRect.bottom + 260;
-          if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
-            targetRow = row;
+        } else {
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rRect = row.getBoundingClientRect();
+            if (rRect.top <= triggerUp && rRect.bottom >= 40) {
+              targetRow = row;
+            }
           }
         }
 
-        // КЛЮЧЕВОЙ МОМЕНТ: если верхняя строка еще не достигла триггера,
-        // удерживаем текущую активную плашку, чтобы она НЕ гасла на середине экрана!
+        // Если следующая плашка еще не пересекла триггерную зону, удерживаем текущую открытую плашку
         if (!targetRow && activeProductRow) {
           const curRect = activeProductRow.getBoundingClientRect();
-          const curEffectiveBottom = curRect.bottom + 260;
-          if (curRect.top < vHeight && curEffectiveBottom > 40) {
+          if (curRect.top < vHeight && curRect.bottom > 40) {
             targetRow = activeProductRow;
           }
         }
-      }
 
-      // Если вообще ни одна строка не определилась, но мы внутри каталога
-      if (!targetRow && rows.length > 0) {
-        for (let i = 0; i < rows.length; i++) {
-          const rRect = rows[i].getBoundingClientRect();
-          if (rRect.top <= (vHeight * 0.5) && (rRect.bottom + 260) > 80) {
-            targetRow = rows[i];
-            break;
+        // Если ни одна плашка еще не была активна (первый вход в каталог), выбираем ближайшую к середине экрана
+        if (!targetRow && rows.length > 0) {
+          let minDistance = Infinity;
+          const screenCenter = vHeight * 0.50;
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rRect = row.getBoundingClientRect();
+            const rowCenter = rRect.top + (rRect.height / 2);
+            const dist = Math.abs(rowCenter - screenCenter);
+            if (dist < minDistance && rRect.top < vHeight && rRect.bottom > 0) {
+              minDistance = dist;
+              targetRow = row;
+            }
+          }
+        }
+      } else {
+        if (scrollDirection === "down") {
+          const triggerPoint = vHeight * 0.42;
+          // При скролле вниз берем самую нижнюю строку, дошедшую до триггера
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rRect = row.getBoundingClientRect();
+            const effectiveBottom = rRect.bottom + 260;
+            if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
+              targetRow = row;
+            }
+          }
+        } else {
+          // При скролле снизу вверх:
+          const triggerPoint = vHeight * 0.30;
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rRect = row.getBoundingClientRect();
+            const effectiveBottom = rRect.bottom + 260;
+            if (rRect.top <= triggerPoint && effectiveBottom >= 80) {
+              targetRow = row;
+            }
+          }
+
+          if (!targetRow && activeProductRow) {
+            const curRect = activeProductRow.getBoundingClientRect();
+            const curEffectiveBottom = curRect.bottom + 260;
+            if (curRect.top < vHeight && curEffectiveBottom > 40) {
+              targetRow = activeProductRow;
+            }
+          }
+        }
+
+        // Если вообще ни одна строка не определилась, но мы внутри каталога
+        if (!targetRow && rows.length > 0) {
+          for (let i = 0; i < rows.length; i++) {
+            const rRect = rows[i].getBoundingClientRect();
+            if (rRect.top <= (vHeight * 0.5) && (rRect.bottom + 260) > 80) {
+              targetRow = rows[i];
+              break;
+            }
           }
         }
       }
@@ -551,7 +608,8 @@ const initApp = () => {
         let anyVisible = false;
         for (let i = 0; i < rows.length; i++) {
           const rRect = rows[i].getBoundingClientRect();
-          if (rRect.top < vHeight && (rRect.bottom + 260) > 0) {
+          const checkBottom = isTabLandscape ? rRect.bottom : (rRect.bottom + 260);
+          if (rRect.top < vHeight && checkBottom > 0) {
             anyVisible = true;
             break;
           }
@@ -698,6 +756,14 @@ const initApp = () => {
         requestAnimationFrame(() => {
           activeOverlay.scrollTop = targetScroll;
         });
+      }
+    } else if (activeOverlay === productsSection) {
+      // При открытии меню каталога на планшетах и мобилках сразу раскрываем первую баночку
+      if (checkIsMobileOrPortraitTablet()) {
+        const firstRow = activeOverlay.querySelector(".product-row");
+        if (firstRow) {
+          activateProductRow(activeOverlay, firstRow, { shouldScroll: false, isUserClick: false });
+        }
       }
     }
 
