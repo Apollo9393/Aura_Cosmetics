@@ -562,6 +562,32 @@ html.overlay-open .burger-btn {
   color: #ffffff;
 }
 
+/* Во всех ландшафтных ориентациях: изображение за банкой и банка выше плашек */
+@media (orientation: landscape) {
+  .product-row.auto-active,
+  .product-row.highlighted {
+    z-index: 100 !important;
+  }
+
+  .product-bg-ambient {
+    z-index: 20 !important;
+  }
+
+  .product-preview {
+    z-index: 30 !important;
+  }
+
+  .product-info {
+    z-index: 50 !important;
+  }
+
+  /* Плашки плавно исчезают ровно к половине экрана */
+  .product-row::before {
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
+  }
+}
+
 /* 8. ВЫЕЗЖАЮЩИЕ ПАНЕЛИ (OVERLAY) */
 .products-section.overlay-mode {
   position: fixed !important;
@@ -890,8 +916,8 @@ html.overlay-open .burger-btn {
   .product-row::before {
     height: 100% !important;
     min-height: 120px !important;
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 55%, rgba(0, 0, 0, 0) 80%) !important;
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 55%, rgba(0, 0, 0, 0) 80%) !important;
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
   }
 
   .product-info {
@@ -918,26 +944,26 @@ html.overlay-open .burger-btn {
   }
 
   .product-preview {
-    right: 15px !important;
-    width: 480px !important;
-    height: 480px !important;
+    right: 32px !important;
+    width: 660px !important;
+    height: 660px !important;
     top: 50% !important;
-    transform: translate3d(15px, -50%, 0) scale(1) !important;
+    transform: translate3d(0, -50%, 0) scale(1) !important;
   }
 
   .product-row.auto-active .product-preview,
   .product-row.highlighted .product-preview {
-    transform: translate3d(15px, -50%, 0) scale(1.05) !important;
+    transform: translate3d(0, -50%, 0) scale(1.08) !important;
   }
 
   .product-bg-ambient {
-    width: 460px !important;
-    height: 310px !important;
-    top: calc(50% + 24px) !important;
-    right: 60px !important;
+    width: 640px !important;
+    height: 420px !important;
+    top: calc(50% + 20px) !important;
+    right: 65px !important;
     left: auto !important;
     transform: translateY(-50%) translateZ(0) !important;
-    border-radius: 18px !important;
+    border-radius: 20px !important;
   }
 
   .slider-arrow {
@@ -992,6 +1018,32 @@ html.overlay-open .burger-btn {
 
   .panel-contact-link {
     font-size: 17px !important;
+  }
+}
+
+/* Компактные ландшафтные экраны 768px - 950px (Image 2: баночка и подложка чуть меньше): */
+@media (min-width: 768px) and (max-width: 950px) and (min-height: 561px) and (orientation: landscape) {
+  .product-preview {
+    width: 500px !important;
+    height: 500px !important;
+    right: 30px !important;
+    top: 50% !important;
+    transform: translate3d(0, -50%, 0) scale(1) !important;
+  }
+
+  .product-row.auto-active .product-preview,
+  .product-row.highlighted .product-preview {
+    transform: translate3d(0, -50%, 0) scale(1.05) !important;
+  }
+
+  .product-bg-ambient {
+    width: 480px !important;
+    height: 320px !important;
+    top: calc(50% + 20px) !important;
+    right: 55px !important;
+    left: auto !important;
+    transform: translateY(-50%) translateZ(0) !important;
+    border-radius: 18px !important;
   }
 }
 
@@ -1165,7 +1217,7 @@ html.overlay-open .burger-btn {
   }
 
   .slider-arrow {
-    bottom: 14px !important;
+    bottom: 6px !important;
   }
 
   /* ----------------------------------------------------
@@ -1179,8 +1231,8 @@ html.overlay-open .burger-btn {
   .product-row::before {
     height: 100% !important;
     min-height: 120px !important;
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 40%, rgba(0, 0, 0, 0) 55%) !important;
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 40%, rgba(0, 0, 0, 0) 55%) !important;
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0) 50%) !important;
   }
 
   .product-info {
@@ -1229,12 +1281,12 @@ html.overlay-open .burger-btn {
   }
 
 
-  /* Живая подложка для первого продукта в ландшафте */
+  /* Живая подложка для первого продукта в ландшафте — на волосок ниже */
   .product-bg-ambient {
     right: 15px !important;
     width: 390px !important;
     height: 255px !important;
-    top: 50% !important;
+    top: calc(50% + 14px) !important;
     border-radius: 12px !important;
     animation: ambientFloatLandscape 8s ease-in-out infinite alternate !important;
   }
@@ -1978,14 +2030,14 @@ html.overlay-open .burger-btn {
 
   body .hero .btn,
   body .hero .hero-content .btn {
-    bottom: 62px !important;
+    bottom: 74px !important;
     max-width: 220px !important;
     padding: 12px 18px !important;
     font-size: 13.5px !important;
   }
 
   .slider-arrow {
-    bottom: 96px !important;
+    bottom: 108px !important;
   }
 
   /* ----------------------------------------------------
@@ -1994,6 +2046,11 @@ html.overlay-open .burger-btn {
   .product-row {
     margin-bottom: 330px !important;
     /* Уменьшаем расстояние до следующего товара */
+    min-height: 150px !important;
+  }
+
+  .product-row {
+    margin-bottom: 330px !important;
     min-height: 150px !important;
   }
 
@@ -2028,11 +2085,13 @@ html.overlay-open .burger-btn {
     max-width: 100% !important;
   }
 
-  /* Поднимаем баночку выше под плашку */
+  /* Видео-анимация банки — чуть меньше */
   .product-preview {
+    left: 50% !important;
+    right: auto !important;
     top: 92px !important;
-    width: 360px !important;
-    height: 360px !important;
+    width: 380px !important;
+    height: 380px !important;
     transform: translateX(-50%) scale(1) !important;
     opacity: 0 !important;
     visibility: hidden !important;
@@ -2048,9 +2107,9 @@ html.overlay-open .burger-btn {
     transform: translateX(-50%) scale(1.15) !important;
   }
 
-  /* Живая подложка в мобильном портрете — компактная и точно за банкой */
+  /* Живая подложка в мобильном портрете — опущена на волосок ниже */
   .product-bg-ambient {
-    top: 145px !important;
+    top: 158px !important;
     left: 50% !important;
     right: auto !important;
     width: 345px !important;
@@ -2244,7 +2303,7 @@ html.overlay-open .burger-btn {
     line-height: 1 !important;
     letter-spacing: 2px !important;
     text-align: center !important;
-    color: #a0df6c !important;
+    color: #8ef528 !important;
     padding: 12px 20px !important;
     margin: 0 !important;
     width: 100% !important;
@@ -2293,7 +2352,7 @@ html.overlay-open .burger-btn {
   /* Поворот в ровный неоновый крестик */
   .burger-btn.active span:nth-child(1) {
     transform: translateY(7.5px) rotate(45deg) !important;
-    background-color: #a0df6c !important;
+    background-color: #8ef528 !important;
   }
 
   .burger-btn.active span:nth-child(2) {
@@ -2303,7 +2362,7 @@ html.overlay-open .burger-btn {
 
   .burger-btn.active span:nth-child(3) {
     transform: translateY(-7.5px) rotate(-45deg) !important;
-    background-color: #a0df6c !important;
+    background-color: #8ef528 !important;
   }
 
   /* Шапка */
@@ -2357,7 +2416,7 @@ html.overlay-open .burger-btn {
   body .hero .btn,
   body .hero .hero-content .btn {
     position: absolute !important;
-    bottom: 62px !important;
+    bottom: 74px !important;
     left: 50% !important;
     transform: translateX(-50%) translateZ(0) !important;
     margin: 0 !important;
@@ -2398,7 +2457,7 @@ html.overlay-open .burger-btn {
   }
 
   .slider-arrow {
-    bottom: 96px !important;
+    bottom: 108px !important;
   }
 
   /* ----------------------------------------------------
@@ -2415,7 +2474,7 @@ html.overlay-open .burger-btn {
     position: relative !important;
     width: 100% !important;
     padding: 0 !important;
-    margin-bottom: 375px !important;
+    margin-bottom: 330px !important;
     /* Запас под банку */
     min-height: 130px !important;
     display: block !important;
@@ -2457,15 +2516,13 @@ html.overlay-open .burger-btn {
     text-align: left !important;
   }
 
-  /* Видео-анимация банки — чуть крупнее */
+  /* Видео-анимация банки — чуть меньше */
   .product-preview {
     left: 50% !important;
     right: auto !important;
     top: 92px !important;
-    width: 430px !important;
-    height: 430px !important;
-    max-width: calc(100vw - 20px) !important;
-    max-height: calc(100vw - 20px) !important;
+    width: 380px !important;
+    height: 380px !important;
     transform: translateX(-50%) scale(1) !important;
   }
 
@@ -2473,18 +2530,17 @@ html.overlay-open .burger-btn {
   .product-row.highlighted .product-preview {
     opacity: 1 !important;
     visibility: visible !important;
-    transform: translateX(-50%) scale(1.18) !important;
+    transform: translateX(-50%) scale(1.15) !important;
   }
 
-  /* Живая подложка позади баночки — чуть крупнее и опущена ниже */
+  /* Живая подложка позади баночки — опущена на волосок ниже */
   .product-bg-ambient {
-    top: 165px !important;
+    top: 158px !important;
     left: 50% !important;
     right: auto !important;
-    width: 450px !important;
-    height: 300px !important;
-    max-width: calc(100vw - 30px) !important;
-    border-radius: 18px !important;
+    width: 345px !important;
+    height: 230px !important;
+    border-radius: 16px !important;
     transform: translate3d(-50%, 0, 0);
     animation: ambientFloatDuoLand 8s ease-in-out infinite alternate !important;
   }
@@ -2559,7 +2615,42 @@ html.overlay-open .burger-btn {
     text-align: center !important;
   }
 }
- 
+
+/* ==========================================================================
+   КОМПАКТНЫЕ ПЛАНШЕТЫ И КВАДРАТНЫЕ ЭКРАНЫ 580px-768px (Image 3: 724x754)
+   ========================================================================== */
+@media (min-width: 580px) and (max-width: 768px) and (min-height: 600px) and (max-height: 899px) {
+  .product-row {
+    margin-bottom: 410px !important;
+  }
+
+  .product-preview {
+    left: 50% !important;
+    right: auto !important;
+    top: 90px !important;
+    width: 480px !important;
+    height: 480px !important;
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  .product-row.auto-active .product-preview,
+  .product-row.highlighted .product-preview {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(-50%) scale(1.26) !important;
+  }
+
+  .product-bg-ambient {
+    top: 155px !important;
+    left: 50% !important;
+    right: auto !important;
+    width: 510px !important;
+    height: 340px !important;
+    border-radius: 18px !important;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 /* ==========================================================================
    ИСКЛЮЧИТЕЛЬНО ДЛЯ SURFACE DUO И ШИРОКИХ ЭКРАНОВ 720x540 (LANDSCAPE)
    ========================================================================== */
@@ -2623,7 +2714,7 @@ html.overlay-open .burger-btn {
     line-height: 1 !important;
     letter-spacing: 2px !important;
     text-align: center !important;
-    color: #a0df6c !important;
+    color: #8ef528 !important;
     padding: 12px 20px !important;
     margin: 0 !important;
     width: 100% !important;
@@ -2670,7 +2761,7 @@ html.overlay-open .burger-btn {
 
   .burger-btn.active span:nth-child(1) {
     transform: translateY(7.5px) rotate(45deg) !important;
-    background-color: #a0df6c !important;
+    background-color: #8ef528 !important;
   }
 
   .burger-btn.active span:nth-child(2) {
@@ -2679,7 +2770,7 @@ html.overlay-open .burger-btn {
 
   .burger-btn.active span:nth-child(3) {
     transform: translateY(-7.5px) rotate(-45deg) !important;
-    background-color: #a0df6c !important;
+    background-color: #8ef528 !important;
   }
 
   .header {
@@ -3403,6 +3494,74 @@ html.overlay-open .burger-btn {
     transform: translate3d(-50%, 0, 0);
     animation: ambientFloatDuoLand 8s ease-in-out infinite alternate !important;
   }
+
+  /* ----------------------------------------------------
+     НАВИГАЦИЯ ДЛЯ IPAD MINI В ПОРТРЕТЕ (КРУПНЫЙ ТЕКСТ)
+     ---------------------------------------------------- */
+  .side-nav {
+    gap: 18px !important;
+  }
+
+  .side-nav a {
+    font-size: 22px !important;
+    letter-spacing: 3px !important;
+    padding: 20px 30px !important;
+  }
+
+  /* ----------------------------------------------------
+     ПАНЕЛИ ABOUT И CONTACT ДЛЯ IPAD MINI В ПОРТРЕТЕ
+     ---------------------------------------------------- */
+  .panel-content {
+    max-width: 640px !important;
+    padding: 60px 40px !important;
+  }
+
+  .panel-title {
+    font-size: 38px !important;
+    letter-spacing: 2.2px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .panel-desc {
+    font-size: 18px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 18px !important;
+  }
+
+  .panel-desc:last-of-type {
+    margin-bottom: 28px !important;
+  }
+
+  .panel-stats {
+    gap: 40px !important;
+    padding-top: 24px !important;
+  }
+
+  .panel-stat-num {
+    font-size: 32px !important;
+  }
+
+  .panel-stat-label {
+    font-size: 13px !important;
+    letter-spacing: 1.5px !important;
+    margin-top: 6px !important;
+  }
+
+  .panel-contact-box {
+    padding-top: 24px !important;
+    margin-top: 24px !important;
+  }
+
+  .panel-contact-label {
+    font-size: 15px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .panel-contact-link {
+    font-size: 24px !important;
+    letter-spacing: 1px !important;
+  }
 }
 
 /* ==========================================================================
@@ -3585,11 +3744,12 @@ html.overlay-open .burger-btn {
     font-size: 14px !important;
   }
 
-  /* Живая подложка позади баночки — на волосок меньше */
+  /* Живая подложка позади баночки — опущена чуть ниже */
   .product-bg-ambient {
+    top: 168px !important;
     width: 315px !important;
     height: 215px !important;
-    transform: translate3d(-50%, -50%, 0);
+    transform: translate3d(-50%, 0, 0) !important;
   }
 
   /* Баночка в меню — ровно на столько же меньше */
