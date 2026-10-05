@@ -49,6 +49,193 @@ body.nav-menu-open {
   overscroll-behavior: none !important;
 }
 
+/* ==========================================================================
+   1.1. НАЧАЛЬНЫЙ ЭКРАН ЗАГРУЗКИ (SPLASH SCREEN / PRELOADER)
+   ========================================================================== */
+.preloader {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 999999 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  background-color: #d1c5b4;
+  overflow: hidden;
+}
+
+.preloader.fade-out {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.preloader.fade-out .preloader-content {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.preloader-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #d1c5b4;
+  background-image: linear-gradient(to left, rgba(91, 84, 61, 0.11) 2%, rgba(62, 59, 46, 0.8) 72%), url("Aura_Cosmetics.webp");
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+@media (max-width: 1024px) and (orientation: portrait),
+(max-width: 768px) {
+  .preloader-bg {
+    background-image: linear-gradient(to top, rgba(91, 84, 61, 0.15) 2%, rgba(62, 59, 46, 0.72) 72%), url("Aura_Cosmetics_mobile.webp");
+  }
+}
+
+.preloader-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  overflow: visible;
+}
+
+.preloader-logo {
+  font-family: "Sansation", sans-serif;
+  font-size: 96px;
+  font-weight: 300;
+  letter-spacing: 18px;
+  margin-right: -18px;
+  color: #ffffff;
+  text-transform: uppercase;
+  /* Исключительно чистое белое свечение */
+  text-shadow: 0 0 16px rgba(255, 255, 255, 1), 0 0 32px rgba(255, 255, 255, 0.85), 0 0 65px rgba(255, 255, 255, 0.6), 0 0 100px rgba(255, 255, 255, 0.35), 0 4px 18px rgba(0, 0, 0, 0.8);
+  display: inline-block;
+  white-space: nowrap;
+  clip-path: inset(-120px 100% -120px -120px);
+  -webkit-clip-path: inset(-120px 100% -120px -120px);
+  animation: preloaderTextReveal 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards, preloaderGlowPulse 2.8s ease-in-out 2.0s infinite alternate;
+}
+
+@keyframes preloaderTextReveal {
+  0% {
+    clip-path: inset(-120px 100% -120px -120px);
+    -webkit-clip-path: inset(-120px 100% -120px -120px);
+    transform: translate3d(-25px, 0, 0);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(-150px -150px -150px -150px);
+    -webkit-clip-path: inset(-150px -150px -150px -150px);
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes preloaderGlowPulse {
+  0% {
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.95), 0 0 32px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 95px rgba(255, 255, 255, 0.3), 0 4px 18px rgba(0, 0, 0, 0.8);
+    transform: scale(1);
+  }
+
+  100% {
+    text-shadow: 0 0 24px rgba(255, 255, 255, 1), 0 0 48px rgba(255, 255, 255, 0.95), 0 0 85px rgba(255, 255, 255, 0.75), 0 0 130px rgba(255, 255, 255, 0.5), 0 4px 22px rgba(0, 0, 0, 0.9);
+    transform: scale(1.02);
+  }
+}
+
+/* ==========================================================================
+   ПЛАВНОЕ ПРОЯВЛЕНИЕ ЭЛЕМЕНТОВ САЙТА СЛЕВА НАПРАВО ПОСЛЕ ПРЕЛОАДЕРА
+   ========================================================================== */
+body.hero-hidden .header {
+  opacity: 0 !important;
+  transform: translate3d(-50px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .title {
+  opacity: 0 !important;
+  transform: translate3d(-80px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .description {
+  opacity: 0 !important;
+  transform: translate3d(-70px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .btn {
+  opacity: 0 !important;
+  transform: translate3d(-60px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .slide.active .bg-video {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .side-nav {
+  opacity: 0 !important;
+  transform: translate3d(-40px, -50%, 0) !important;
+  pointer-events: none !important;
+}
+
+body.hero-hidden .slider-arrow {
+  opacity: 0 !important;
+  transform: translate3d(-40px, 0, 0) !important;
+  pointer-events: none !important;
+}
+
+/* Каскадное появление слева направо с мягкой задержкой (Stagger) */
+.header {
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.05s, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
+}
+
+.title {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+.description {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.30s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.30s;
+}
+
+.btn {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slide.active .bg-video {
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s ease;
+}
+
+.side-nav {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.50s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.50s;
+}
+
+.slider-arrow {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.50s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.50s, color 0.3s, filter 0.3s;
+}
+
 /* 2. ШАПКА И ЛОГОТИП */
 .header {
   position: fixed !important;
@@ -480,6 +667,113 @@ html.overlay-open .burger-btn {
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+/* Атмосферный полноэкранный фон для секции каталога / меню (временно скрыт) */
+.products-backdrop-ambient {
+  display: none !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.products-section.overlay-mode .products-backdrop-ambient {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 0 !important;
+}
+
+.products-backdrop-img {
+  position: absolute;
+  top: 4%;
+  left: 4%;
+  width: 92%;
+  height: 92%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  animation: productsBackdropFloat 13s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
+   НАСТРОЙКА РАЗМЕРА И ЗАКРУГЛЕНИЯ ФОНА ДЛЯ ДЕСКТОПОВ (ПК И НОУТБУКИ)
+   Здесь вы можете менять масштаб, отступы и радиус скругления:
+   - border-radius: 24px (радиус скругления углов)
+   - top / left / width / height: отступы и размеры рамки
+   - background-size: cover (заполнение области)
+   ========================================================================== */
+@media (min-width: 1025px) {
+  .products-backdrop-img {
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    border-radius: 24px;
+    background-size: cover;
+    background-position: center center;
+  }
+}
+
+.products-backdrop-img.bg-1 {
+  background-image: url("product1_bg.jpg") !important;
+}
+
+.products-backdrop-img.bg-2 {
+  background-image: url("product2_bg.jpg") !important;
+}
+
+@keyframes productsBackdropFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.02) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(-16px, 12px, 0) scale(1.06) rotate(0.4deg);
+  }
+
+  50% {
+    transform: translate3d(14px, -10px, 0) scale(1.03) rotate(-0.3deg);
+  }
+
+  75% {
+    transform: translate3d(-10px, -16px, 0) scale(1.07) rotate(0.3deg);
+  }
+
+  100% {
+    transform: translate3d(12px, 14px, 0) scale(1.04) rotate(-0.2deg);
+  }
+}
+
+/* Появление полноэкранного фона при активности товара (прозрачность ~90%, opacity: 0.10) */
+.products-section:has(#product-yellow.auto-active) .products-backdrop-img.bg-1,
+.products-section:has(#product-yellow.highlighted) .products-backdrop-img.bg-1,
+.products-section.active-product-1 .products-backdrop-img.bg-1 {
+  opacity: 0.10 !important;
+  visibility: visible !important;
+}
+
+.products-section:has(#product-pink.auto-active) .products-backdrop-img.bg-2,
+.products-section:has(#product-pink.highlighted) .products-backdrop-img.bg-2,
+.products-section.active-product-2 .products-backdrop-img.bg-2 {
+  opacity: 0.10 !important;
+  visibility: visible !important;
 }
 
 /* Живая плавающая подложка за баночками каталога */

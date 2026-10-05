@@ -1,3 +1,45 @@
+// Начальный экран загрузки (Preloader / Splash Screen)
+const initPreloader = () => {
+  const preloader = document.getElementById("preloader");
+  if (!preloader) {
+    document.body.classList.remove("hero-hidden");
+    runSlideSequence(0);
+    return;
+  }
+
+  const startTime = Date.now();
+  const minDuration = 1900; // Достаточно времени для плавного проявления светящегося логотипа
+
+  let isHidden = false;
+  const hidePreloader = () => {
+    if (isHidden) return;
+    isHidden = true;
+
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minDuration - elapsed);
+
+    setTimeout(() => {
+      // Плавное растворение экрана загрузки и моментальное проявление контента без задержек
+      preloader.classList.add("fade-out");
+      document.body.classList.remove("hero-hidden");
+      runSlideSequence(0);
+
+      setTimeout(() => {
+        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+      }, 900);
+    }, remaining);
+  };
+
+  if (document.readyState === "complete") {
+    hidePreloader();
+  } else {
+    window.addEventListener("load", hidePreloader, { once: true });
+  }
+
+  // Защитный таймаут на случай очень медленного соединения
+  setTimeout(hidePreloader, 6000);
+};
+
 const slides = document.querySelectorAll(".slide");
 const slideData = Array.from(slides).map((s) => ({
   slide: s,
@@ -49,7 +91,10 @@ function runSlideSequence(slideIndex) {
   if (isFirstInit) {
     isFirstInit = false;
     isTransitioning = false;
-    if (video) video.play().catch(() => { });
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => { });
+    }
   } else {
     if (video) {
       video.currentTime = 0;
@@ -156,8 +201,6 @@ window.addEventListener("touchend", (e) => {
     runSlideSequence(currentSlideIndex);
   }
 }, { passive: true });
-
-runSlideSequence(0);
 
 // ==========================================
 // ОСНОВНОЕ ПРИЛОЖЕНИЕ И ОВЕРЛЕИ
@@ -395,6 +438,16 @@ const initApp = () => {
       }
     });
 
+    if (row.id === "product-yellow") {
+      container.classList.add("active-product-1");
+      container.classList.remove("active-product-2");
+    } else if (row.id === "product-pink") {
+      container.classList.add("active-product-2");
+      container.classList.remove("active-product-1");
+    } else {
+      container.classList.remove("active-product-1", "active-product-2");
+    }
+
     if (shouldScroll && container.classList.contains("overlay-mode") && !isUserClick) {
       const isLandscape = checkIsLandscape();
       const isMobile = checkIsMobileOrPortraitTablet();
@@ -408,6 +461,7 @@ const initApp = () => {
   const deactivateAllProductRows = (container) => {
     if (!container) return;
     activeProductRow = null;
+    container.classList.remove("active-product-1", "active-product-2");
     const rows = container.querySelectorAll(".product-row");
     rows.forEach((r) => {
       r.classList.remove("auto-active", "highlighted");
@@ -419,17 +473,9 @@ const initApp = () => {
     const rows = container.querySelectorAll(".product-row");
 
     rows.forEach((row) => {
-      // Единый обработчик наведения для мыши
+      // Обработчик наведения для мыши
       row.addEventListener("mouseenter", () => {
         activateProductRow(container, row, { shouldScroll: false, isUserClick: false });
-      });
-
-      row.addEventListener("mouseleave", () => {
-        row.classList.remove("auto-active", "highlighted");
-        stopRowPreviewVideo(row);
-        if (activeProductRow === row) {
-          activeProductRow = null;
-        }
       });
 
       let touchStartX = 0, touchStartY = 0, touchStartTime = 0, touchMoved = false;
@@ -467,12 +513,6 @@ const initApp = () => {
         toggleProductRow(container, row, { shouldScroll: false, isUserClick: true });
       });
     });
-
-    container.addEventListener("mouseleave", () => {
-      if (!checkIsMobileOrPortraitTablet()) {
-        deactivateAllProductRows(container);
-      }
-    });
   };
   let updateCenterRowGlobal = null;
 
@@ -485,7 +525,6 @@ const initApp = () => {
     let scrollDirection = "down";
 
     const updateCenterRow = () => {
-      if (!checkIsMobileOrPortraitTablet()) return;
       if (Date.now() < userTapLockUntil) return;
 
       const isOverlay = container.classList.contains("overlay-mode");
@@ -507,11 +546,11 @@ const initApp = () => {
       }
 
       const vHeight = isOverlay ? container.clientHeight : window.innerHeight;
-      const isTabLandscape = checkIsTabletLandscape();
+      const isLandscapeMode = (window.innerWidth > window.innerHeight) || checkIsTabletLandscape() || checkIsLandscape();
       let targetRow = null;
 
-      if (isTabLandscape) {
-        // ДЛЯ ПЛАНШЕТОВ В ЛАНДШАФТНОЙ ОРИЕНТАЦИИ:
+      if (isLandscapeMode) {
+        // ДЛЯ ВСЕХ ДЕСКТОПОВ И ЛАНДШАФТНЫХ ЭКРАНОВ:
         // Сбалансированная центральная зона активации (54% от верха при скролле вниз, 38% при скролле вверх)
         const triggerDown = vHeight * 0.54;
         const triggerUp = vHeight * 0.38;
@@ -608,7 +647,7 @@ const initApp = () => {
         let anyVisible = false;
         for (let i = 0; i < rows.length; i++) {
           const rRect = rows[i].getBoundingClientRect();
-          const checkBottom = isTabLandscape ? rRect.bottom : (rRect.bottom + 260);
+          const checkBottom = isLandscapeMode ? rRect.bottom : (rRect.bottom + 260);
           if (rRect.top < vHeight && checkBottom > 0) {
             anyVisible = true;
             break;
@@ -758,12 +797,10 @@ const initApp = () => {
         });
       }
     } else if (activeOverlay === productsSection) {
-      // При открытии меню каталога на планшетах и мобилках сразу раскрываем первую баночку
-      if (checkIsMobileOrPortraitTablet()) {
-        const firstRow = activeOverlay.querySelector(".product-row");
-        if (firstRow) {
-          activateProductRow(activeOverlay, firstRow, { shouldScroll: false, isUserClick: false });
-        }
+      // При открытии меню каталога сразу раскрываем первую баночку на всех устройствах
+      const firstRow = activeOverlay.querySelector(".product-row");
+      if (firstRow) {
+        activateProductRow(activeOverlay, firstRow, { shouldScroll: false, isUserClick: false });
       }
     }
 
@@ -1009,7 +1046,11 @@ const initApp = () => {
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initApp);
+  document.addEventListener("DOMContentLoaded", () => {
+    initApp();
+    initPreloader();
+  });
 } else {
   initApp();
+  initPreloader();
 }
